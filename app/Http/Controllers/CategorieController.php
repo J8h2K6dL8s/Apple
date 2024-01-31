@@ -11,9 +11,9 @@ class CategorieController extends Controller
 {
     public function index()
     {
-        $categories = Categorie::all()->orderBy('id', 'desc')->get();
+        $categories = Categorie::orderBy('id', 'desc')->get();
 
-        return response()->json(['message' => 'Liste des categories ','categories' => $categories], 201);
+        return response()->json(['message' => 'Liste des catégories', 'categories' => $categories], 200);
     }
 
     public function store(Request $request)

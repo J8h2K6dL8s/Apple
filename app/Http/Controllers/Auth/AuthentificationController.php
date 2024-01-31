@@ -177,10 +177,13 @@ class AuthentificationController extends Controller
     
     public function verify($user_id, Request $request)
     {
-       
+        // Récupère l'utilisateur correspondant à l'identifiant $user_id
+
         $user = User::findOrFail($user_id);
-    
+        
+        // Vérifie si l'e-mail de l'utilisateur a déjà été vérifié
         if (!$user->hasVerifiedEmail()) {
+            // Si l'e-mail n'a pas été vérifié, marque l'e-mail comme vérifié
             $user->markEmailAsVerified();
             
         }
