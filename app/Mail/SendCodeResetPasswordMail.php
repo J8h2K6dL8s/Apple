@@ -12,15 +12,19 @@ use Illuminate\Queue\SerializesModels;
 class SendCodeResetPasswordMail extends Mailable
 {
    public $code;
+   public $type;
+   public $url;
 
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($code)
+    
+    public function __construct($code,$type)
     {
         $this->code=$code;
+        $this->type=$type;
     }
 
     /**
@@ -29,19 +33,31 @@ class SendCodeResetPasswordMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Code de Reinitialisation',
+            subject: 'Code de Reinitialisation | Mr Apple',
         );
     }
 
     /**
      * Get the message content definition.
      */
-    public function content(): Content
-    {
-        return (new Content)
-            ->view('emails/authentification/passwordforget',['code' =>$this->code]);
-
+    public function content() {  
+       
+        if ($this->type =='user') { 
+               $this->url="https://mrapple-store.com/reinitialisation";
+           } else {
+               $this->url="https://mrapple-store.com/admin/reinitialisation";
+           }
+       return (new Content)
+          ->view('emails/authentification/passwordforget',['code' =>$this->code, 'url' => $this->url]);
+       
     }
+    
+    // public function content(): Content
+    // {
+    //     return (new Content)
+    //         ->view('emails/authentification/passwordforget',['code' =>$this->code, 'url' => $this->url]);
+
+    // }
 
     /**
      * Get the attachments for the message.

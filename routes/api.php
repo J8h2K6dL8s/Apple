@@ -8,6 +8,8 @@ use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\CodePromoController;
 use App\Http\Controllers\Auth\AuthentificationController;
 use App\Http\Controllers\ChiffreAffaireController;
+use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\PanierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +32,11 @@ Route::post('/register', [AuthentificationController::class, 'register']);
 
 Route::post('/login', [AuthentificationController::class, 'login']); 
 
+Route::post('/check-email', [AuthentificationController::class, 'checkEmail']); 
+
 Route::post('/sendMailPasswordForgot', [AuthentificationController::class, 'sendMailPasswordForgot']);
 
-Route::get('/verify-email/{user_id}', [AuthentificationController::class, 'verify'])->name('verification.verify');
+Route::get('/verify-email/{id}', [AuthentificationController::class, 'verify'])->name('verification.verify');
 
 Route::post('/email/verification-notification', [AuthentificationController::class, 'resendEmailVerification'])->name('verification.send');
 
@@ -59,39 +63,57 @@ Route::group(['middleware' => ['superadmin']], function () {
 
  });
 
+ 
+Route::group(['middleware' => ['admin']], function () {
+
                                         //CATEGORIES
 
-Route::post('/ajouter-categorie', [CategorieController::class, 'store']); 
+    Route::post('/ajouter-categorie', [CategorieController::class, 'store']); 
 
-Route::post('/modifier-categorie/{id}', [CategorieController::class, 'update']);
+    Route::post('/modifier-categorie/{id}', [CategorieController::class, 'update']);
 
-Route::get('/voir-categories/{id}', [CategorieController::class, 'show']);
+    Route::get('/voir-categories/{id}', [CategorieController::class, 'show']);
 
-Route::get('/supprimer-categorie/{id}', [CategorieController::class, 'delete']);
+    Route::get('/supprimer-categorie/{id}', [CategorieController::class, 'delete']);
 
-Route::get('/liste-categories', [CategorieController::class, 'index']);
+    Route::get('/liste-categories', [CategorieController::class, 'index']);
 
-Route::get('/{idCategorie}/liste_produits_par_categorie', [CategorieController::class, 'liste_produits_par_categorie']);
+    Route::get('/{idCategorie}/liste_produits_par_categorie', [CategorieController::class, 'liste_produits_par_categorie']);
 
-Route::get('/total-categorie', [CategorieController::class, 'nbrTotalCatgories']);
+    Route::get('/total-categorie', [CategorieController::class, 'nbrTotalCatgories']);
 
 
-                                        //PRODUITS
+                                            //PRODUITS
 
-Route::post('/ajouter-produit', [ProduitController::class, 'store']); 
+    Route::post('/ajouter-produit', [ProduitController::class, 'store']); 
 
-Route::post('/modifier-produit/{produit}', [ProduitController::class, 'update']); 
+    Route::post('/modifier-produit/{produit}', [ProduitController::class, 'update']); 
 
-Route::get  ('/supprimer-produit/{id}', [ProduitController::class, 'delete']); 
+    Route::get  ('/supprimer-produit/{id}', [ProduitController::class, 'delete']); 
 
-Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
+    Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
 
-Route::get('/liste-produits', [ProduitController::class, 'index']); 
-  
-Route::get('/total-produit', [ProduitController::class, 'nbrTotalProduits']);
+    Route::get('/liste-produits', [ProduitController::class, 'index']); 
+    
+    Route::get('/total-produit', [ProduitController::class, 'nbrTotalProduits']);
 
-Route::post('/rechercher-produit', [ProduitController::class, 'rechercher_produit_par_nom']);
+    Route::post('/rechercher-produit', [ProduitController::class, 'rechercher_produit_par_nom']);
 
+                                            //CODES PROMOS
+                                            
+    Route::post('/ajouter-codePromo', [CodePromoController::class, 'store']);
+
+    Route::get('/modifier-codePromo/{id}', [CodePromoController::class, 'update']);
+
+    Route::get('/supprimer-codePromo/{id}', [CodePromoController::class, 'delete']);
+
+    Route::get('/voir-codePromo/{id}', [CodePromoController::class, 'show']);
+    
+    Route::post('/verifier-codePromo', [CodePromoController::class, 'checkValidity']);  
+
+    Route::get('/liste-codePromos', [CodePromoController::class, 'index']);
+
+});
 
                                         //FAVORIS
 
@@ -102,28 +124,18 @@ Route::get('/supprimer-favoris/{id}', [FavorisController::class, 'supprimerUnFav
 Route::get('/mes-favoris', [FavorisController::class, 'mesFavoris']);
 
 
-                                        //CODES PROMOS
-                                        
- Route::post('/ajouter-codePromo', [CodePromoController::class, 'store']);
-
- Route::get('/modifier-codePromo/{id}', [CodePromoController::class, 'update']);
-
- Route::get('/supprimer-codePromo/{id}', [CodePromoController::class, 'delete']);
-
- Route::get('/voir-codePromo/{id}', [CodePromoController::class, 'show']);
- 
- Route::post('/verifier-codePromo', [CodePromoController::class, 'checkValidity']);  
-
- Route::get('/liste-codePromos', [CodePromoController::class, 'index']);
-
-
                                     //CHIFFRES DAFFAIRES
-                                    
+
 Route::get('/chiffre-affaires', [ChiffreAffaireController::class, 'calculerChiffreAffaires']);
 
 Route::get('/chiffre-affaires/mois-en-cours', [ChiffreAffaireController::class, 'calculerChiffreAffairesMoisEnCours']);
                  
 
+                                    //COMMANDES
 
+Route::get('/ajouter-panier/{id}', [PanierController::class, 'addCart']);
 
+Route::get('/supprimer-panier/{rowId}', [PanierController::class, 'removeCart']);
+
+Route::get('/contenu-panier', [PanierController::class, 'recupererContenuPanier']);
 

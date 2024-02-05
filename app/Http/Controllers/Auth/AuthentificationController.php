@@ -23,7 +23,7 @@ class AuthentificationController extends Controller
             'nom' =>"required|string|max:255",
             // 'prenom' =>"required|string",
             'telephone'=>'required|',
-            'type' => 'in:user,admin,superadmin',
+            'type' => 'required|in:user,admin,superadmin',
             'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
             'password' => 'required',
             'confirmPassword' => 'required' 
@@ -60,8 +60,10 @@ class AuthentificationController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string|email:rfc,dns|max:255',
             'password' => 'required',
+            'type' => 'required|in:user,admin,superadmin',
+
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -76,7 +78,7 @@ class AuthentificationController extends Controller
             ]);
             }
             else {
-                return response(['message' => 'Adresse mail non trouve&eacute;e'], 401);
+                return response(['message' => ' Vérifier votre email pour activer votre compte'], 401);
             }
         } else {
             return response(['message' => 'Identifiants incorrects ! Veuillez r&eacute;ssayer'], 401);
@@ -174,7 +176,7 @@ class AuthentificationController extends Controller
                             
                         }
     } 
-    
+
     public function verify($user_id, Request $request)
     {
         // Récupère l'utilisateur correspondant à l'identifiant $user_id
@@ -183,13 +185,14 @@ class AuthentificationController extends Controller
         
         // Vérifie si l'e-mail de l'utilisateur a déjà été vérifié
         if (!$user->hasVerifiedEmail()) {
+
             // Si l'e-mail n'a pas été vérifié, marque l'e-mail comme vérifié
             $user->markEmailAsVerified();
             
         }
-    
+
        return response(['success' => 'Email vérifié avec succ&egrave;s.']);
-        //    return redirect('https://heimdall-store.com/compte-valide'); 
+        //    return redirect('http://localhost:5175/comptevalide'); 
     }
 
     public function resendEmailVerification() {
@@ -234,10 +237,10 @@ class AuthentificationController extends Controller
                         ]);
 
                         // Send email to user
-                        if(Mail::to($request->email)->send(new SendCodeResetPasswordMail($codeData->code))){
+                        if(Mail::to($request->email)->send(new SendCodeResetPasswordMail($codeData->code,User::firstWhere('email', $request->email)->type))){
     
-                        return response(['message' => trans('passwords.sent')], 200);
-            } else {dd("error");}
+                            return response(['message' => trans('passwords.sent')], 200);
+                        } else {dd("error");}
                     }
                     else {
                         return response(["msg" => "Utilisateur introuvable ! Veuillez v&eacute;rifier votre adresse mail"], 404);
