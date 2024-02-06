@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\AuthentificationController;
 use App\Http\Controllers\ChiffreAffaireController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\PanierController;
+use App\Http\Controllers\VarianteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,8 +32,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthentificationController::class, 'register']); 
 
 Route::post('/login', [AuthentificationController::class, 'login']); 
-
-Route::post('/check-email', [AuthentificationController::class, 'checkEmail']); 
 
 Route::post('/sendMailPasswordForgot', [AuthentificationController::class, 'sendMailPasswordForgot']);
 
@@ -61,10 +60,16 @@ Route::group(['middleware' => ['superadmin']], function () {
 
     Route::post('/ajouter-admin', [AuthentificationController::class, 'register']); 
 
+    Route::get('/liste-admin', [AuthentificationController::class, 'index']); 
+
+    Route::get('/supprimer-admin/{id}', [AuthentificationController::class, 'delete']);
+
+
+
  });
 
  
-Route::group(['middleware' => ['admin']], function () {
+Route::middleware(['auth'])->group(function () {   
 
                                         //CATEGORIES
 
@@ -98,6 +103,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/total-produit', [ProduitController::class, 'nbrTotalProduits']);
 
     Route::post('/rechercher-produit', [ProduitController::class, 'rechercher_produit_par_nom']);
+
+
+                                        //VARIANTES
+
+    Route::post('/ajouter-variante', [VarianteController::class, 'store']); 
+
+    Route::post('/modifier-variantes/{variante}', [VarianteController::class, 'update']);
+
+
 
                                             //CODES PROMOS
                                             

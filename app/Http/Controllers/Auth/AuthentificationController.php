@@ -17,45 +17,105 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 
 class AuthentificationController extends Controller
 {
-    public function register(Request $request) 
-    { 
-        $validator = Validator::make($request->all(), [
-            'nom' =>"required|string|max:255",
-            // 'prenom' =>"required|string",
-            'telephone'=>'required|',
-            'type' => 'required|in:user,admin,superadmin',
-            'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
-            'password' => 'required',
-            'confirmPassword' => 'required' 
+    public function index()
+    {
+        $admins = User::where('type', 'admin')->orderBy('id', 'desc')->get();
 
-        ]);
-         
-        if ($validator->fails()) {
-            return response(["error" =>  $validator->errors()->all()], 200);  
-        }
-           
-        else { 
-       
-           $user = User::create([
-               'nom' => $request->nom,
-            //    'prenom' => $request->prenom,
-               'telephone'=>$request->telephone,
-               'email' => $request->email,
-               'type' =>$request->type,
-               'password' => Hash::make($request->password),
-               'confirmPassword' => Hash::make($request->password),
-           ]);
-
-       
-           Notification::send($user, new VerifyEmail($user));
- 
-               $token = $user->createToken('api_token')->plainTextToken;
-              // $this->login($request);
-           return response([
-               'user' => $user,   'token' => $token,   ], 201);
-        }
-        
+        return response(['admins' => $admins], 200);
     }
+
+    public function delete(Request $request, $id)
+    {
+            $user = User::withTrashed()->find($id);
+
+            if ($user) {
+                $user->delete();
+                return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
+            } else {
+                return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+            }
+    }
+
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nom' => 'required|string|max:255',
+            'telephone' => 'required|integer',
+            'type' => 'required|in:user,admin,superadmin',
+            'email' => "required|string|email:rfc,dns|max:255|unique:" . User::class,
+            'password' => 'required',
+            'confirmPassword' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response(["error" => $validator->errors()->all()], 200);
+        } else {
+            $user = User::create([
+                'nom' => $request->nom,
+                'telephone' => $request->telephone,
+                'email' => $request->email,
+                'type' => $request->type,
+                'password' => Hash::make($request->password),
+                'confirmPassword' => Hash::make($request->password),
+            ]);
+
+            if ($user->type == 'admin') {
+                // Activer automatiquement l'email pour les administrateurs
+                $user->email_verified_at = now();
+                $user->save();
+            } else {
+                // Envoyer un email de vérification pour les autres types d'utilisateurs
+                Notification::send($user, new VerifyEmail($user));
+            }
+
+            $token = $user->createToken('api_token')->plainTextToken;
+
+            return response([
+                'user' => $user,
+                'token' => $token,
+            ], 201);
+        }
+    }
+
+    // public function register(Request $request) 
+    // { 
+    //     $validator = Validator::make($request->all(), [
+    //         'nom' =>"required|string|max:255",
+    //         // 'prenom' =>"required|string",
+    //         'telephone'=>'required|integer',
+    //         'type' => 'required|in:user,admin,superadmin',
+    //         'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
+    //         'password' => 'required',
+    //         'confirmPassword' => 'required' 
+
+    //     ]);
+         
+    //     if ($validator->fails()) {
+    //         return response(["error" =>  $validator->errors()->all()], 200);  
+    //     }
+           
+    //     else { 
+       
+    //        $user = User::create([
+    //            'nom' => $request->nom,
+    //         //    'prenom' => $request->prenom,
+    //            'telephone'=>$request->telephone,
+    //            'email' => $request->email,
+    //            'type' =>$request->type,
+    //            'password' => Hash::make($request->password),
+    //            'confirmPassword' => Hash::make($request->password),
+    //        ]);
+
+       
+    //        Notification::send($user, new VerifyEmail($user));
+ 
+    //            $token = $user->createToken('api_token')->plainTextToken;
+    //           // $this->login($request);
+    //        return response([
+    //            'user' => $user,   'token' => $token,   ], 201);
+    //     }
+        
+    // }
 
     public function login(Request $request)
     {
@@ -81,7 +141,7 @@ class AuthentificationController extends Controller
                 return response(['message' => ' Vérifier votre email pour activer votre compte'], 401);
             }
         } else {
-            return response(['message' => 'Identifiants incorrects ! Veuillez r&eacute;ssayer'], 401);
+            return response(['message' => 'Identifiants incorrects ! Veuillez réessayer'], 401);
         }
     }
 
@@ -95,10 +155,11 @@ class AuthentificationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
-            'prenom' => 'required|string',
-            'telephone' => 'required',  
-            'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
-            'password' => 'required' 
+            // 'prenom' => 'required|string',
+            'telephone' => 'required|integer',  
+            // 'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
+            // 'password' => 'required' 
+            // 'confirpassword' => 'required' 
             
         
         ]);
@@ -111,9 +172,9 @@ class AuthentificationController extends Controller
             $user->update([
                 'nom' => $request->nom,
                 'telephone' => $request->telephone,
-                'prenom' => $request->prenom,
-                'type' => $request->type, 
-                'email' => $request->email,
+                // 'prenom' => $request->prenom,
+                // 'type' => $request->type, 
+                // 'email' => $request->email,
             ]);
 
             return response([
@@ -129,7 +190,7 @@ class AuthentificationController extends Controller
         if($user){
             $user->tokens()->delete();
             return [
-                'Message'=>'Utilisateur D&eacute;connect&eacute;'
+                'Message'=>'Utilisateur Déconnecter avec succès;'
                 ];
         }
             else {
@@ -145,7 +206,7 @@ class AuthentificationController extends Controller
                 return response($user,200);
 
                 } else {
-                    return response(['error' => 'Aucun utilisateur trouv&eacute;',],200);
+                    return response(['error' => 'Aucun utilisateur trouver;',],200);
 
             }
     }
@@ -243,7 +304,7 @@ class AuthentificationController extends Controller
                         } else {dd("error");}
                     }
                     else {
-                        return response(["msg" => "Utilisateur introuvable ! Veuillez v&eacute;rifier votre adresse mail"], 404);
+                        return response(["msg" => "Utilisateur introuvable ! Veuillez vérifier votre adresse mail"], 404);
                     }
             }
     }
@@ -288,7 +349,7 @@ class AuthentificationController extends Controller
                 // delete current code 
                 $passwordReset->delete();
 
-                return response(['message' =>'Le mot de passe a &eacute;t&eacute; r&eacute;initialis&eacute; avec succ&egrave;s'], 200);
+                return response(['message' =>'Le mot de passe a été réinitialisé avec succès'], 200);
             }
     }
 
@@ -308,9 +369,9 @@ class AuthentificationController extends Controller
               ], 422); 
           }
           $data = $request->all();
-          Mail::to('hello@apple.com')->send(new ContactMail($data));
+          Mail::to('contact@mrapple-store.com')->send(new ContactMail($data));
 
-        return response()->json(['message' => 'Message sent successfully'], 200);
+        return response()->json(['message' => 'Message envoyer avec succès'], 200);
     }
 
 }

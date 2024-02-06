@@ -16,25 +16,15 @@ class Variante extends Model
     
     protected $table = 'variantes'; 
 
-    protected $fillable = ['produit_id', 'type', 'valeur', 'prix','image'];
+    protected $fillable = ['produit_id', 'type', 'valeur', 'prix'];
 
     public function produit()
     {
         return $this->belongsTo(Produit::class, 'produit_id');
     }
 
-    // public function image()
-    // {
-    //     return $this->hasOne(Image::class, 'id');
-    // }
-
-    // public function images()
-    // {
-    //     return $this->belongsTo(Image::class);
-    // }
-
-    // public function images()
-    // {
-    //     return $this->hasMany(Image::class);
-    // }
+    public function images()
+    {
+        return $this->hasMany(VarianteImage::class);
+    }
 }

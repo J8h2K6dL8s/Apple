@@ -21,7 +21,7 @@ class CodePromoController extends Controller
         $validator = Validator::make($request->all(), [
         
             'intitule' => 'required',
-            'nombreUtilisation' =>"required",
+            'nombreUtilisation' =>"required|min:1",
             'valeur' => 'required|integer|max:100',
            ]);
            

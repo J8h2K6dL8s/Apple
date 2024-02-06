@@ -7,6 +7,72 @@ use Illuminate\Http\Request;
 
 class PROdController extends Controller
 {
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nom' => 'required|string',
+            'description' => 'required|string',
+            'capacite' => 'nullable|string', // Ajoutez la validation pour la capacité
+            'couleur' => 'nullable|string', 
+            'prix' => 'required|numeric',
+            'categorie_id' => 'required|exists:categories,id',
+            'images' => 'required|array|min:1', // Validation pour les images du produit
+            'images.*' => 'image|file|mimes:jpeg,png,jpg,|max:2048',
+            'variantes.*.type' => 'string|in:couleur,capacite', 
+            'variantes.*.valeur' => 'string',
+            'variantes.*.prix' => 'numeric',
+            'variantes.*.image' => 'image|file|mimes:jpeg,png,jpg,|max:2048',
+        ]);
+
+        // Création du produit
+        $produit = Produit::create([
+            'nom' => $request->input('nom'),
+            'description' => $request->input('description'),
+            'capacite' => $request->input('capacite'),
+            'couleur' => $request->input('couleur'),
+            'prix' => $request->input('prix'),
+            'categorie_id' => $request->input('categorie_id'),
+        ]);
+
+        // Ajout des images au produit
+        if ($request->hasFile('images')) {
+
+            foreach ($request->file('images') as $image) {
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('public/fichiers_produit/', $filename);
+                $imageName = 'public/fichiers_produit/' . $filename;
+
+                // Dispatch du job pour traiter l'image en arrière-plan
+                dispatch(new ImageJob($produit->id, $imageName));
+            }
+        }
+        $produit->images;
+
+       // Ajout des variantes si elles sont fournies
+        if ($request->has('variantes')) {
+            foreach ($request->variantes as $varianteData) {
+                // Créez une variante
+                $variante = new Variante([
+                    'type' => $varianteData['type'],
+                    'valeur' => $varianteData['valeur'],
+                    'prix' => $varianteData['prix'],
+                ]);
+
+                // Ajout de l'image de variante si elle est fournie
+                if (isset($varianteData['image'])) {
+                    $filename = uniqid() . '.' . $varianteData['image']->getClientOriginalExtension();
+                    $path = $varianteData['image']->storeAs('public/fichiers_variantes/', $filename);
+                    $imageName = 'public/fichiers_variantes/' . $filename;
+                    $variante->image = $imageName;
+                }
+
+                $produit->variantes()->save($variante);
+            }
+        }
+        $produit->load('variantes');
+
+        return response()->json(['message' => 'Produit ajouté avec succès', 'produit' => $produit], 201);
+    }
 
     public function storeVraie(Request $request)
     {
@@ -168,7 +234,7 @@ class PROdController extends Controller
         return response()->json(['produit' => $produit], 200);
     }
 
-    public function store(Request $request)
+    public function storess(Request $request)
     {
         $request->validate([
             'nom' => 'required|string',
