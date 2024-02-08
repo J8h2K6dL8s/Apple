@@ -21,3 +21,4 @@ Route::get('/', function () {
 
 Route::get('/confirmation', [AuthentificationController::class, 'showConfirmation'])->name('confirmation');
 
+Route::get('/contact', [AuthentificationController::class, 'contact'])->name('contact');

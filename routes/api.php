@@ -153,3 +153,17 @@ Route::get('/supprimer-panier/{rowId}', [PanierController::class, 'removeCart'])
 
 Route::get('/contenu-panier', [PanierController::class, 'recupererContenuPanier']);
 
+Route::post('/modifier-quantite-panier/{id}', [PanierController::class, 'modifierQuantite']);
+
+
+Route::get('/liste-commandes', [CommandeController::class, 'index']);
+
+Route::get('/mes-commandes', [CommandeController::class, 'mesCommandes']);
+
+Route::get('/voir-commande/{id}', [CommandeController::class, 'show']);
+
+Route::get('/commandes-en-attente', [CommandeController::class, 'nombreCommandesEnAttente']);
+   
+Route::get('/total-commandes', [CommandeController::class, 'nbrTotalCommandes']);
+    
+Route::post('/valider', [CommandeController::class, 'validercommande']);

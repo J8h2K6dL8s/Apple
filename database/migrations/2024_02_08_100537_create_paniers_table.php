@@ -14,13 +14,17 @@ return new class extends Migration
         Schema::create('paniers', function (Blueprint $table) {
             $table->id();
             $table->string('token');
-            $table->string('nomProduit');
-            $table->string('idProduit');
-            $table->integer('qty');
-            $table->string('image');
-            $table->integer('prix');
+            $table->unsignedBigInteger('idProduit');
+            $table->string('nomProduit')->nullable(); 
+            $table->unsignedBigInteger('idVariante')->nullable(); 
+            $table->integer('qty'); 
+            // $table->string('image'); 
+            $table->integer('prix'); 
             $table->timestamps();
+            $table->foreign('idProduit')->references('id')->on('produits')->onDelete('cascade');
+            $table->foreign('idVariante')->references('id')->on('variantes')->onDelete('set null'); 
             $table->softDeletes();
+            
         });
     }
 

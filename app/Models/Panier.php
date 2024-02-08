@@ -20,8 +20,9 @@ class Panier extends Model
         'token',
         'nomProduit',
         'idProduit',
+        'idVariante',
         'qty',
-        'image',
+        // 'image',
         'prix'
     ];
 }

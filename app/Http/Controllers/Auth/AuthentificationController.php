@@ -17,6 +17,11 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 
 class AuthentificationController extends Controller
 {
+    public function contact()
+    {
+        return view('emails/orderDetailsCommande');
+    }
+
     public function index()
     {
         $admins = User::where('type', 'admin')->orderBy('id', 'desc')->get();
