@@ -96,9 +96,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get  ('/supprimer-produit/{id}', [ProduitController::class, 'delete']); 
 
-    Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
+    // Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
 
-    Route::get('/liste-produits', [ProduitController::class, 'index']); 
+    // Route::get('/liste-produits', [ProduitController::class, 'index']); 
     
     Route::get('/total-produit', [ProduitController::class, 'nbrTotalProduits']);
 
@@ -128,6 +128,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/liste-codePromos', [CodePromoController::class, 'index']);
 
 });
+
+
+Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
+
+Route::get('/liste-produits', [ProduitController::class, 'index']); 
 
                                         //FAVORIS
 

@@ -82,46 +82,6 @@ class AuthentificationController extends Controller
         }
     }
 
-    // public function register(Request $request) 
-    // { 
-    //     $validator = Validator::make($request->all(), [
-    //         'nom' =>"required|string|max:255",
-    //         // 'prenom' =>"required|string",
-    //         'telephone'=>'required|integer',
-    //         'type' => 'required|in:user,admin,superadmin',
-    //         'email' =>"required|string|email:rfc,dns|max:255|unique:".User::class,
-    //         'password' => 'required',
-    //         'confirmPassword' => 'required' 
-
-    //     ]);
-         
-    //     if ($validator->fails()) {
-    //         return response(["error" =>  $validator->errors()->all()], 200);  
-    //     }
-           
-    //     else { 
-       
-    //        $user = User::create([
-    //            'nom' => $request->nom,
-    //         //    'prenom' => $request->prenom,
-    //            'telephone'=>$request->telephone,
-    //            'email' => $request->email,
-    //            'type' =>$request->type,
-    //            'password' => Hash::make($request->password),
-    //            'confirmPassword' => Hash::make($request->password),
-    //        ]);
-
-       
-    //        Notification::send($user, new VerifyEmail($user));
- 
-    //            $token = $user->createToken('api_token')->plainTextToken;
-    //           // $this->login($request);
-    //        return response([
-    //            'user' => $user,   'token' => $token,   ], 201);
-    //     }
-        
-    // }
-
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -195,7 +155,7 @@ class AuthentificationController extends Controller
         if($user){
             $user->tokens()->delete();
             return [
-                'Message'=>'Utilisateur Déconnecter avec succès;'
+                'Message' => 'Utilisateur déconnecté avec succès.'
                 ];
         }
             else {
@@ -238,7 +198,7 @@ class AuthentificationController extends Controller
                         $user->password = Hash::make($request->new_password);
                         $user->save();
 
-                    return response(['success' => 'Mot de passe modifi&eacute; avec succ&egrave;s.']);
+                        return response(['success' => 'Mot de passe modifié avec succès.']);
                             
                         }
     } 
@@ -257,7 +217,7 @@ class AuthentificationController extends Controller
             
         }
 
-       return response(['success' => 'Email vérifié avec succ&egrave;s.']);
+        return response(['success' => 'Email vérifié avec succès.']);
         //    return redirect('http://localhost:5175/comptevalide'); 
     }
 
@@ -376,7 +336,7 @@ class AuthentificationController extends Controller
           $data = $request->all();
           Mail::to('contact@mrapple-store.com')->send(new ContactMail($data));
 
-        return response()->json(['message' => 'Message envoyer avec succès'], 200);
+          return response()->json(['message' => 'Message envoyé avec succès'], 200);
     }
 
 }
