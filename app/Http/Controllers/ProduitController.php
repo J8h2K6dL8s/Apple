@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Jobs\ImageJob;
 use App\Models\Produit;
 use App\Models\Variante;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Jobs\VarianteImageJob;
 use App\Models\VarianteImage;
+use App\Jobs\VarianteImageJob;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
 
 class ProduitController extends Controller
 {
@@ -34,9 +36,13 @@ class ProduitController extends Controller
         $request->validate([
             'nom' => 'required|string',
             'description' => 'required|string',
-            'capacite' => 'required|string', 
-            'couleur' => 'required|string', 
-            'prix' => 'required|numeric',
+            'capacite' => 'nullable|integer',
+            'unite' => [
+                'required_with:capacite', // L'unité est requise si la capacité est fournie
+                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+            ], 
+            'couleur' => 'nullable|string', 
+            'prix' => 'required|integer',
             'categorie_id' => 'required|exists:categories,id',
             'images' => 'required|array|min:1',
             'images.*' => 'image|file|mimes:jpeg,png,jpg,|max:2048',
@@ -47,6 +53,7 @@ class ProduitController extends Controller
             'nom' => $request->input('nom'),
             'description' => $request->input('description'),
             'capacite' => $request->input('capacite'),
+            'unite' => $request->input('unite'),
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
@@ -71,72 +78,54 @@ class ProduitController extends Controller
 
     public function update(Request $request, Produit $produit)
     {
-        // Validation des données de la requête
         $request->validate([
             'nom' => 'required|string',
             'description' => 'required|string',
-            'capacite' => 'nullable|string',
-            'couleur' => 'nullable|string',
-            'prix' => 'required|numeric',
+            'capacite' => 'nullable|integer',
+            'unite' => [
+                'required_with:capacite', // L'unité est requise si la capacité est fournie
+                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+            ], 
+            'couleur' => 'nullable|string', 
+            'prix' => 'required|integer',
             'categorie_id' => 'required|exists:categories,id',
-            'images' => 'nullable|array|min:1', 
-            'images.*' => 'image|file|mimes:jpeg,png,jpg,|max:2048',
-            'variantes.*.type' => 'string|in:couleur,capacite',
-            'variantes.*.valeur' => 'string',
-            'variantes.*.prix' => 'numeric',
-            'variantes.*.image' => 'nullable|image|file|mimes:jpeg,png,jpg,|max:2048', 
+            'images' => 'nullable|array|min:1',
+            'images.*' => 'nullable|image|file|mimes:jpeg,png,jpg|max:2048',
         ]);
-    
-        // Mise à jour des données du produit
+
+        // Mise à jour des attributs du produit
         $produit->update([
             'nom' => $request->input('nom'),
             'description' => $request->input('description'),
             'capacite' => $request->input('capacite'),
+            'unite' => $request->input('unite'),
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
         ]);
-    
-        // Mise à jour des images du produit
+
+        // Ajout des nouvelles images seulement si elles sont fournies
         if ($request->hasFile('images')) {
+            // Supprimer les anciennes images
+            $produit->images()->delete();
+            
+            // Ajouter les nouvelles images
             foreach ($request->file('images') as $image) {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
                 $path = $image->storeAs('public/fichiers_produit/', $filename);
                 $imageName = 'public/fichiers_produit/' . $filename;
-    
-                // Dispatch du job pour traiter l'image en arrière-plan
-                dispatch(new ImageJob($produit->id, $imageName));
+
+                // Enregistrement du chemin de l'image dans la table produit_images
+                Image::create([
+                    'produit_id' => $produit->id,
+                    'chemin_image' => $imageName,
+                ]);
             }
         }
 
-        $produit->images;
-    
-        // Mise à jour des variantes si elles sont fournies
-        if ($request->has('variantes')) {
-            $produit->variantes()->delete(); // Supprimer toutes les variantes existantes avant d'ajouter les nouvelles
-    
-            foreach ($request->variantes as $varianteData) {
-                // Créez une variante
-                $variante = new Variante([
-                    'type' => $varianteData['type'],
-                    'valeur' => $varianteData['valeur'],
-                    'prix' => $varianteData['prix'],
-                ]);
-    
-                // Ajout de l'image de variante si elle est fournie
-                if (isset($varianteData['image'])) {
-                    $filename = uniqid() . '.' . $varianteData['image']->getClientOriginalExtension();
-                    $path = $varianteData['image']->storeAs('public/fichiers_variantes/', $filename);
-                    $imageName = 'public/fichiers_variantes/' . $filename;
-                    $variante->image = $imageName;
-                }
-    
-                $produit->variantes()->save($variante);
-            }
-        }
-    
-        $produit->load('variantes'); // Recharger les variantes après la mise à jour
-    
+        // Chargement des images pour le produit mis à jour
+        $produit->load('images');
+
         return response()->json(['message' => 'Produit mis à jour avec succès', 'produit' => $produit], 200);
     }
     

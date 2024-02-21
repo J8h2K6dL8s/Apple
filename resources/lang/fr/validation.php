@@ -59,5 +59,34 @@ return [
         'new_password' => [
             'required' => 'Le champ du nouveau mot de passe est requis.',
         ],
+
+        'required' => 'Le champ :attribute est requis.',
+        'string' => 'Le champ :attribute doit être une chaîne de caractères.',
+        'numeric' => 'Le champ :attribute doit être un nombre.',
+        'exists' => 'La valeur sélectionnée pour :attribute est invalide.',
+        'image' => 'Le champ :attribute doit être une image.',
+        'mimes' => 'Le champ :attribute doit être un fichier de type :values.',
+        'max' => [
+            'numeric' => 'Le champ :attribute ne doit pas dépasser :max.',
+            'file' => 'Le champ :attribute ne doit pas dépasser :max kilo-octets.',
+        ],
+        'array' => 'Le champ :attribute doit être un tableau.',
+        'min' => [
+            'numeric' => 'Le champ :attribute doit avoir au moins :min.',
+            'file' => 'Le champ :attribute doit avoir au moins :min kilo-octets.',
+            'string' => 'Le champ :attribute doit avoir au moins :min caractères.',
+            'array' => 'Le champ :attribute doit avoir au moins :min éléments.',
+        ],
+        'categorie_id.exists' => 'La catégorie sélectionnée est invalide.',
+        'images.required' => 'Au moins une image doit être fournie.',
+        'images.array' => 'Le champ images doit être un tableau.',
+        'images.min' => 'Au moins une image doit être fournie.',
+        'images.*.image' => 'Les fichiers images doivent être des images valides.',
+        'images.*.file' => 'Les fichiers images doivent être des fichiers valides.',
+        'images.*.mimes' => 'Les fichiers images doivent être de type :values.',
+        'images.*.max' => 'Les fichiers images ne doivent pas dépasser :max kilo-octets.',
+    
     ],
+
+    
 ];

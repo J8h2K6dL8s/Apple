@@ -7,11 +7,108 @@ use App\Models\Variante;
 use Illuminate\Http\Request;
 use App\Models\VarianteImage;
 use App\Jobs\VarianteImageJob;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 
 class VarianteController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        // Récupération de toutes les variantes dans l'ordre décroissant
+        $variantes = Variante::orderBy('id', 'desc')->get();
+
+        // Chargement des images pour chaque variante
+        $variantes->load('images');
+
+        return response()->json(['variantes' => $variantes], 200);
+    }
+
     public function store(Request $request)
+    {
+        $request->validate([
+            'produit_id' => 'required|exists:produits,id',
+            'type' => 'required|string|in:couleur,capacite',
+            'valeur' => 'required|string',
+            'unite' => [
+                'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
+                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+            ],
+            'prix' => 'required|numeric',
+            'images' => 'nullable|array|min:1',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $variante = Variante::create([
+            'produit_id' => $request->produit_id,
+            'type' => $request->type,
+            'valeur' => $request->valeur,
+            'unite' => $request->unite ?? null, // Assurez-vous que l'unité est correctement définie ou null si non applicable
+            'prix' => $request->prix,
+        ]);
+
+        // Ajout des images à la variante actuelle
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('public/fichiers_variante/', $filename);
+                $imageName = 'public/fichiers_variante/' . $filename;
+
+                // Enregistrement du chemin de l'image dans la table variante_images
+                VarianteImage::create([
+                    'variante_id' => $variante->id,
+                    'chemin_image' => $imageName,
+                ]);
+            }
+        }
+
+        // Chargement des images pour la variante actuelle
+        $variante->load('images');
+
+        return response()->json(['message' => 'Variante ajoutée avec succès', 'variante' => $variante], 201);
+    }
+
+
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'produit_id' => 'required|exists:produits,id',
+    //         'type' => 'required|string|in:couleur,capacite',
+    //         'valeur' => 'required|string',
+    //         'prix' => 'required|numeric',
+    //         'images' => 'nullable|array|min:1',
+    //         'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    //     ]);
+
+    //     $variante = Variante::create([
+    //         'produit_id' => $request->produit_id,
+    //         'type' => $request->type,
+    //         'valeur' => $request->valeur,
+    //         'prix' => $request->prix,
+    //     ]);
+
+    //     // Ajout des images à la variante actuelle
+    //     if ($request->hasFile('images')) {
+    //         foreach ($request->file('images') as $image) {
+    //             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+    //             $path = $image->storeAs('public/fichiers_variante/', $filename);
+    //             $imageName = 'public/fichiers_variante/' . $filename;
+
+    //             // Enregistrement du chemin de l'image dans la table variante_images
+    //             VarianteImage::create([
+    //                 'variante_id' => $variante->id,
+    //                 'chemin_image' => $imageName,
+    //             ]);
+    //         }
+    //     }
+
+    //     // Chargement des images pour la variante actuelle
+    //     $variante->load('images');
+
+    //     return response()->json(['message' => 'Variante ajoutée avec succès', 'variante' => $variante], 201);
+    // }
+
+    public function stores(Request $request)
     {  
         $request->validate([
             'produit_id' => 'required|exists:produits,id',
@@ -63,19 +160,25 @@ class VarianteController extends Controller
             'type' => 'required|string|in:couleur,capacite',
             'valeur' => 'required|string',
             'prix' => 'required|numeric',
+            'unite' => [
+                'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
+                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+            ],
             'images' => 'nullable|array|min:1', 
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Mise à jour des attributs de la variante
         $variante->update([
             'type' => $request->type,
             'valeur' => $request->valeur,
             'prix' => $request->prix,
+            'unite' => $request->unite ?? null, // Assurez-vous que l'unité est correctement définie ou null si non applicable
         ]);
 
-        // Ajouter les nouvelles images seulement si elles sont fournies
+        // Ajout des nouvelles images seulement si elles sont fournies
         if ($request->hasFile('images')) {
-            // Supprimer les images existantes
+            // Supprimer les anciennes images
             $variante->images()->delete();
             
             // Ajouter les nouvelles images
@@ -99,6 +202,17 @@ class VarianteController extends Controller
     }
 
 
+    public function delete(Request $request, $id)
+    {
+            $variante = Variante::withTrashed()->find($id);
+
+            if ($variante) {
+                $variante->delete();
+                return response()->json(['message' => 'Variante supprimé avec succès'], 200);
+            } else {
+                return response()->json(['error' => 'Variante non trouvé'], 404);
+            }
+    }
 
 
 }

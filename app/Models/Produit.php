@@ -26,6 +26,18 @@ class Produit extends Model
        
     ]; 
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($produit) {
+            // Supprimer les images associées à ce produit
+            $produit->images()->delete();
+            // Supprimer les variantes associées à ce produit
+            $produit->variantes()->delete();
+        });
+    }
+
     public function categorie()
     {
         return $this->belongsTo(Categorie::class, 'categorie_id', 'id');

@@ -17,6 +17,15 @@ class Categorie extends Model
 
     protected $fillable = ['nom'];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($categorie) {
+            $categorie->produits()->delete();
+        });
+    }
+
     public function produits()
     {
         return $this->hasMany('App\Models\Produit','categorie_id');

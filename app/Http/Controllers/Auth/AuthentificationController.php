@@ -217,8 +217,8 @@ class AuthentificationController extends Controller
             
         }
 
-        return response(['success' => 'Email vérifié avec succès.']);
-        //    return redirect('http://localhost:5175/comptevalide'); 
+        // return response(['success' => 'Email vérifié avec succès.']);
+           return redirect('http://localhost:5173/comptevalide'); 
     }
 
     public function resendEmailVerification() {

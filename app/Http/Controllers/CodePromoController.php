@@ -31,7 +31,8 @@ class CodePromoController extends Controller
           $codePromo=codePromo::create([
             'intitule' => $request->intitule,
             'valeur' => $request->valeur,
-            'nombreUtilisation' => $request->nombreUtilisation
+            'nombreUtilisation' => $request->nombreUtilisation,
+            'nombreUtilise' => 0,
           ]);
  
         return response()->json(['message' => 'Code Promo ajouté avec succès','codePromo' => $codePromo], 200);
@@ -77,27 +78,57 @@ class CodePromoController extends Controller
 
     public function checkValidity(Request $request)
     {
-    
         $validator = Validator::make($request->all(), [
             'codePromo' => 'required|string',
         ]);
-           
+        
         if ($validator->fails()) {
-              return response(['errors' => $validator->errors(), ], 422); 
+            return response(['errors' => $validator->errors(), ], 422); 
         }
 
         // Récupération du code promo depuis la base de données
-        $promo = codePromo::where('intitule', $request->input('codePromo'))->first();
+        $promo = CodePromo::where('intitule', $request->input('codePromo'))->first();
 
         // Vérification de la validité du code promo
-        if ($promo && $promo->nombreUtilisation > 0) {
+        if ($promo && $promo->nombreUtilise < $promo->nombreUtilisation) {
+            // Mise à jour du nombre d'nombreUtilise
+            $promo->nombreUtilise += 1;
+            $promo->save();
+
             // Le code promo est valide, vous pouvez ajouter des actions supplémentaires ici
             return response()->json(['message' => 'Code Promo valide','value' => $promo->valeur/100]);
+        } elseif ($promo && $promo->nombreUtilise >= $promo->nombreUtilisation) {
+            // Le nombre d'nombreUtilise a déjà atteint le maximum autorisé
+            return response()->json(['erreur' => "Le code promo a déjà été utilisé le nombre maximum de fois."]);
         } else {
             // Le code promo n'est pas valide
-            return response()->json(['erreur' => "Code promo errone ou épuisé"]);
+            return response()->json(['erreur' => "Code promo erroné ou épuisé"]);
         }
     }
+
+    // public function checkValidity(Request $request)
+    // {
+    
+    //     $validator = Validator::make($request->all(), [
+    //         'codePromo' => 'required|string',
+    //     ]);
+           
+    //     if ($validator->fails()) {
+    //           return response(['errors' => $validator->errors(), ], 422); 
+    //     }
+
+    //     // Récupération du code promo depuis la base de données
+    //     $promo = codePromo::where('intitule', $request->input('codePromo'))->first();
+
+    //     // Vérification de la validité du code promo
+    //     if ($promo && $promo->nombreUtilisation > 0) {
+    //         // Le code promo est valide, vous pouvez ajouter des actions supplémentaires ici
+    //         return response()->json(['message' => 'Code Promo valide','value' => $promo->valeur/100]);
+    //     } else {
+    //         // Le code promo n'est pas valide
+    //         return response()->json(['erreur' => "Code promo errone ou épuisé"]);
+    //     }
+    // }
 
     public function delete(Request $request, $id)
     {

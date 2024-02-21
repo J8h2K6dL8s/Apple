@@ -10,20 +10,21 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('produits', function (Blueprint $table) {
-            $table->id();
-            $table->string('nom');
-            $table->text('description');
-            $table->integer('prix'); 
-            $table->unsignedBigInteger('categorie_id');
-            $table->string('capacite')->nullable();
-            $table->string('couleur')->nullable();
-            $table->timestamps();
-            $table->foreign('categorie_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->softDeletes();
-        });
-    }
+{
+    Schema::create('produits', function (Blueprint $table) {
+        $table->id();
+        $table->string('nom');
+        $table->text('description');
+        $table->integer('prix'); 
+        $table->unsignedBigInteger('categorie_id');
+        $table->integer('capacite'); // Changer le type de 'capacite' en integer
+        $table->string('unite')->nullable(); // Ajouter le champ 'unite'
+        $table->string('couleur')->nullable();
+        $table->timestamps();
+        $table->foreign('categorie_id')->references('id')->on('categories')->onDelete('cascade');
+        $table->softDeletes();
+    });
+}
 
     /**
      * Reverse the migrations.

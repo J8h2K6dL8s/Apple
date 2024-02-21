@@ -18,6 +18,20 @@ class Variante extends Model
 
     protected $fillable = ['produit_id', 'type', 'valeur', 'prix'];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($variante) {
+            // Supprimer les images associées à cette variante
+            $variante->images()->delete();
+            // Supprimer le produit associé à cette variante
+            if ($variante->produit) {
+                $variante->produit->delete();
+            }
+        });
+    }
+
     public function produit()
     {
         return $this->belongsTo(Produit::class, 'produit_id');

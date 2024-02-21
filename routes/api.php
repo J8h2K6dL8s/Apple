@@ -2,15 +2,17 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\TradeController;
+use App\Http\Controllers\PanierController;
 use App\Http\Controllers\FavorisController;
 use App\Http\Controllers\ProduitController;
+use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\VarianteController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\CodePromoController;
-use App\Http\Controllers\Auth\AuthentificationController;
 use App\Http\Controllers\ChiffreAffaireController;
-use App\Http\Controllers\CommandeController;
-use App\Http\Controllers\PanierController;
-use App\Http\Controllers\VarianteController;
+use App\Http\Controllers\Auth\AuthentificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,9 +68,8 @@ Route::group(['middleware' => ['superadmin']], function () {
 
 
 
- });
+});
 
- 
 Route::middleware(['auth'])->group(function () {   
 
                                         //CATEGORIES
@@ -94,26 +95,45 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/modifier-produit/{produit}', [ProduitController::class, 'update']); 
 
-    Route::get  ('/supprimer-produit/{id}', [ProduitController::class, 'delete']); 
-
-    // Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
-
-    // Route::get('/liste-produits', [ProduitController::class, 'index']); 
+    Route::get  ('/supprimer-produit/{id}', [ProduitController::class, 'delete']);
     
     Route::get('/total-produit', [ProduitController::class, 'nbrTotalProduits']);
 
     Route::post('/rechercher-produit', [ProduitController::class, 'rechercher_produit_par_nom']);
 
 
+                                        //IMAGES
+
+    Route::post('/ajouter-images', [ImageController::class, 'addImages']);
+
+    Route::get('/supprimer-image/{id}', [ImageController::class, 'deleteImage']);
+
+    Route::post('/ajouter-imagesVariante', [ImageController::class, 'addImagesVariante']);
+
+    Route::get('/supprimer-imagesVariante/{id}', [ImageController::class, 'delete']);
+
+
                                         //VARIANTES
 
     Route::post('/ajouter-variante', [VarianteController::class, 'store']); 
 
-    Route::post('/modifier-variantes/{variante}', [VarianteController::class, 'update']);
+    Route::post('/modifier-variante/{variante}', [VarianteController::class, 'update']);
+
+    Route::get  ('/supprimer-variante/{id}', [VarianteController::class, 'delete']); 
+
+    Route::get('/liste-variante', [VarianteController::class, 'index']);
+
+    
+                                        //FAVORIS
+
+    Route::get('/ajouter-favoris/{id}', [FavorisController::class, 'ajouterAuxFavoris']);
+
+    Route::get('/supprimer-favoris/{id}', [FavorisController::class, 'supprimerUnFavoris']);
+                    
+    Route::get('/mes-favoris', [FavorisController::class, 'mesFavoris']);
 
 
-
-                                            //CODES PROMOS
+                                        //CODES PROMOS
                                             
     Route::post('/ajouter-codePromo', [CodePromoController::class, 'store']);
 
@@ -127,20 +147,51 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/liste-codePromos', [CodePromoController::class, 'index']);
 
+
+                                      //COMMANDES
+
+    Route::get('/ajouter-panier/{id}', [PanierController::class, 'addCart']);
+
+    Route::get('/supprimer-panier/{rowId}', [PanierController::class, 'removeCart']);
+
+    Route::get('/contenu-panier', [PanierController::class, 'recupererContenuPanier']);
+
+    Route::post('/modifier-quantite-panier/{id}', [PanierController::class, 'modifierQuantite']);
+
+
+    Route::get('/liste-commandes', [CommandeController::class, 'index']);
+
+    Route::get('/mes-commandes', [CommandeController::class, 'mesCommandes']);
+
+    Route::get('/voir-commande/{id}', [CommandeController::class, 'show']);
+
+    Route::get('/commandes-en-attente', [CommandeController::class, 'nombreCommandesEnAttente']);
+    
+    Route::get('/total-commandes', [CommandeController::class, 'nbrTotalCommandes']);
+        
+    Route::post('/valider', [CommandeController::class, 'validercommande']);
+
+    Route::get('/payer', [CommandeController::class, 'payer']);
+
+    Route::post('/payment', [CommandeController::class, 'payment']);
+    
+    Route::post('/enregistrer-paiement', [CommandeController::class, 'savePayment']);
+
+
+
+                                            //TRADE
+
+    Route::get('/liste-trades', [TradeController::class, 'index']);
+
+    Route::get('/voir-trades/{id}', [TradeController::class, 'show']);
+
 });
 
+Route::post('/ajouter-trade', [TradeController::class, 'store']);
 
 Route::get('/voir-produits/{produit}', [ProduitController::class, 'show']); 
 
 Route::get('/liste-produits', [ProduitController::class, 'index']); 
-
-                                        //FAVORIS
-
-Route::get('/ajouter-favoris/{id}', [FavorisController::class, 'ajouterAuxFavoris']);
-
-Route::get('/supprimer-favoris/{id}', [FavorisController::class, 'supprimerUnFavoris']);
-                
-Route::get('/mes-favoris', [FavorisController::class, 'mesFavoris']);
 
 
                                     //CHIFFRES DAFFAIRES
@@ -150,25 +201,4 @@ Route::get('/chiffre-affaires', [ChiffreAffaireController::class, 'calculerChiff
 Route::get('/chiffre-affaires/mois-en-cours', [ChiffreAffaireController::class, 'calculerChiffreAffairesMoisEnCours']);
                  
 
-                                    //COMMANDES
-
-Route::get('/ajouter-panier/{id}', [PanierController::class, 'addCart']);
-
-Route::get('/supprimer-panier/{rowId}', [PanierController::class, 'removeCart']);
-
-Route::get('/contenu-panier', [PanierController::class, 'recupererContenuPanier']);
-
-Route::post('/modifier-quantite-panier/{id}', [PanierController::class, 'modifierQuantite']);
-
-
-Route::get('/liste-commandes', [CommandeController::class, 'index']);
-
-Route::get('/mes-commandes', [CommandeController::class, 'mesCommandes']);
-
-Route::get('/voir-commande/{id}', [CommandeController::class, 'show']);
-
-Route::get('/commandes-en-attente', [CommandeController::class, 'nombreCommandesEnAttente']);
-   
-Route::get('/total-commandes', [CommandeController::class, 'nbrTotalCommandes']);
-    
-Route::post('/valider', [CommandeController::class, 'validercommande']);
+                              
