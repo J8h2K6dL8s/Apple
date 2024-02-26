@@ -11,7 +11,10 @@ use Illuminate\Http\Request;
 use App\Mail\OrderDetailsMail;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
+use App\Mail\OrderAchatMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
 class CommandeController extends Controller
@@ -65,6 +68,43 @@ class CommandeController extends Controller
             // Si la commande n'est pas trouvée, renvoyez une réponse 404
             return response()->json(['message' => 'Commande non trouvée'], 404);
         }
+    }
+
+    public function mesCommande(Request $request)
+    {
+        // Récupérer les commandes de l'utilisateur actuel
+        $user = auth('sanctum')->user();
+
+            $commandes = Commande::where('user_id', $user->id)
+                            ->orderBy('id', 'desc')
+                            ->get();
+
+        // $commandes = Commande::where('user_id', app('currentUser')->id)->get();
+
+        // Vérifier si des commandes ont été trouvées
+        if ($commandes->isEmpty()) {
+            // Aucune commande trouvée, retourner un message approprié
+            return response()->json(['message' => 'Aucune commande trouvée pour cet utilisateur.'], 404);
+        }
+
+        // Commandes trouvées, les formater pour la réponse JSON
+        $formattedCommandes = [];
+        foreach ($commandes as $commande) {
+            $formattedCommandes[] = [
+                'order_id' => $commande->order_id,
+                'codePromo' => $commande->codePromo,
+                'produit_id' => json_decode($commande->produit_id, true),
+                'prix_total' => $commande->prix_total,
+                'status' => $commande->status,
+                'quantite' => $commande->quantite,
+                'user_id' => $commande->user_id,
+                'user_name' => $commande->user_name,
+                'date_created' => $commande->date_created
+            ];
+        }
+
+        // Retourner les commandes formatées
+        return response()->json(['commandes' => $formattedCommandes], 200);
     }
 
     public function mesCommandes()
@@ -124,7 +164,7 @@ class CommandeController extends Controller
 
     public function nombreCommandesEnAttente()
     {
-        $nombreEnAttente = Commande::where('statut', 'en_attente')->count();
+        $nombreEnAttente = Commande::where('status', 'en_attente')->count();
         
         return response()->json(['message' => "Le nombre de commande en attente est : " . $nombreEnAttente], 200);
     }
@@ -137,135 +177,116 @@ class CommandeController extends Controller
 
     } 
 
-    public function payment(Request $request ){
+    public function payment(Request $request) {
   
+        $user = auth('sanctum')->user(); 
+    
         if($request->codepromo !== "UNDEFINED"){
            
             $promo = codePromo::where('intitule', $request->input('codepromo'))->first();
             
-                if($promo && $promo->nombreUtilisation > 0){
-                    $codePromo =$request->codepromo ;
-                    $promo->nombreUtilisation =  $promo->nombreUtilisation - 1;
-                    $promo ->save();
-                 
-                    if(!$request->idProduit) {
-                           $url="https://mrapple-store.com/panier";
-            $token = $request->header('Authorization');
-            $paniers = Panier::where('token', $token)->get();
-            $prix = 0;
-             $qty= 0;
-             $idsDansLePanier = [];
-            
-           foreach ($paniers  as $produit) {
-              
-                $qty += $produit->qty;
-                
-                 $prix += $produit->prix *  $qty;
-                $idsDansLePanier[] =["id" =>$produit->idProduit, "qty" =>$produit->qty];
-             }
-              $produits=$idsDansLePanier;
-           
-              $prix = $prix - $promo->valeur * $prix /100;
-                      
+            if($promo && $promo->nombreUtilisation > 0){
+                $codePromo = $request->codepromo;
+                $promo->nombreUtilisation = $promo->nombreUtilisation - 1;
+                $promo->save();
+             
+                if(!$request->idProduit) {
+                    $url = "https://mrapple-store.com/panier";
+                    $token = $request->header('Authorization');
+                    $paniers = Panier::where('token', $token)->get();
+                    $prix = 0;
+                    $qty = 0;
+                    $idsDansLePanier = [];
+                    
+                    foreach ($paniers as $produit) {
+                        $qty += $produit->qty;
+                        $prix += $produit->prix * $qty;
+                        $idsDansLePanier[] = ["id" => $produit->idProduit, "qty" => $produit->qty];
                     }
-                    else {
-                           $url="https://mrapple-store.com/payement";
-            $produit=Produit::findorfail($request->idProduit);
-            $produits[]=["id" =>$produit->id, "qty" =>$produit->quantite];
-            $prix =$produit->prix; 
-            $qty = 1;
-                       
-                        $prix = $prix - $promo->valeur * $prix /100;
-                    }
+                    $produits = $idsDansLePanier;
+        
+                    $prix = $prix - $promo->valeur * $prix /100;
+                        
+                } else {
+                    $url = "https://mrapple-store.com/payment";
+                    $produit = Produit::findOrFail($request->idProduit);
+                    $produits[] = ["id" => $produit->id, "qty" => $produit->quantite];
+                    $prix = $produit->prix; 
+                    $qty = 1;
+                        
+                    $prix = $prix - $promo->valeur * $prix /100;
                 }
-                else 
-                {
-                    return response()->json(['erreur' => "Code promo errone ou code épuisé "]);
-                }
-        } 
-        else {
-       
-       $codePromo=null;
-        if(!$request->idProduit ) {
-            $url="https://mrapple-store.com/panier";
-            $token = $request->header('Authorization');
-            $paniers = Panier::where('token', $token)->get();
-            $prix = 0;
-             $qty= 0;
-             $idsDansLePanier = [];
-           foreach ($paniers  as $produit) {
-                $qty += $produit->qty;
-                 $prix += $produit->prix *  $produit->qty;
-                $idsDansLePanier[] =["id" =>$produit->idProduit, "qty" =>$produit->qty];
-             }
-              $produits=$idsDansLePanier;
-   
-        }
-        else {
-            
-                $url="https://heimdall-store.com/payement";
-            $produit=Produit::findorfail($request->idProduit);
-            $produits[]=["id" =>$produit->id, "qty" =>$produit->quantite];
-            $prix =$produit->prix; 
-            $qty = 1;
+            } else {
+                return response()->json(['erreur' => "Code promo erroné ou code épuisé"]);
             }
- 
+        } else {
+            $codePromo = null;
+            if(!$request->idProduit) {
+                $url = "https://mrapple-store.com/panier";
+                $token = $request->header('Authorization');
+                $paniers = Panier::where('token', $token)->get();
+                $prix = 0;
+                $qty = 0;
+                $idsDansLePanier = [];
+                foreach ($paniers as $produit) {
+                    $qty += $produit->qty;
+                    $prix += $produit->prix * $produit->qty;
+                    $idsDansLePanier[] = ["id" => $produit->idProduit, "qty" => $produit->qty];
+                }
+                $produits = $idsDansLePanier;
+            }
         }
-      
-       
+    
         $prefix = 'MRAPPLE_ORDER-';
         $randomNumber = mt_rand(1000, 9999); 
         $orderID = $prefix . $randomNumber;
-       $produits_serialized = json_encode($produits);
-
-      
-        $vente=Commande::create([
+        $produits_serialized = json_encode($produits);
+    
+        $vente = Commande::create([
             'order_id' => $orderID,
             'codePromo' => $codePromo ? $codePromo : null,
-            'produit_id'=> $produits_serialized ,
-            'prix_total' => $prix ,
+            'produit_id' => $produits_serialized,
+            'prix_total' => $prix,
             'status' => "Unpaid",
-            'quantite' => $qty ,
-            'user_id' => app('currentUser')->id,
-            'user_name' => app('currentUser')->nom.' '.app('currentUser')->prenoms,
-            'date_created'=> Carbon::now()
-          ]);
-         
-        //  $_SESSION[app('currentUser')->nom]=$vente->order_id; 
-          
-
- 
-         /* Rempacez VOTRE_CLE_API par votre véritable clé API */
+            'quantite' => $qty,
+            'user_id' => $user->id,
+            'user_name' => $user->nom . ' ' . $user->prenoms,
+            'date_created' => now()
+        ]);
+    
+        // Remplacez VOTRE_CLE_API par votre véritable clé API
         \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
-         // \FedaPay\FedaPay::setApiKey("sk_sandbox_mGVNXupMPNzgS08eH8BGsJlo");
-       /* Précisez si vous souhaitez exécuter votre requête en mode test ou live */
-           \FedaPay\FedaPay::setEnvironment('sandbox'); //ou setEnvironment('live');
- 
-           /* Créer la transaction */ 
-          $transaction = \FedaPay\Transaction::create(array(
-           "description" =>   app('currentUser')->nom." ".$prix,
-           "amount" => $prix,
-           "currency" => ["iso" => "XOF"],
-           "callback_url" => $url,
-           "customer" => [
-               "firstname" =>app('currentUser')->nom,
-            //    "lastname" => app('currentUser')->prenoms,
-               "email" => app('currentUser')->email,
-               "phone_number" => [
-                   "number" => app('currentUser')->telephone,
-                   "country" => "bj"
-               ]
-           ]
-           ));
-           
+        // \FedaPay\FedaPay::setApiKey("sk_sandbox_mGVNXupMPNzgS08eH8BGsJlo");
+        // Précisez si vous souhaitez exécuter votre requête en mode test ou live
+        \FedaPay\FedaPay::setEnvironment('sandbox'); //ou setEnvironment('live');
+    
+        // Créer la transaction
+        // $transaction = \FedaPay\Transaction::create([
           
-           $token = $transaction->generateToken(); 
-           
-           return response()->json(['url' => $token->url, 'commande'=> $vente], 200);
-        
-          
-    }
+            $tab=explode(' ',$user->nom);
+        $transaction = \FedaPay\Transaction::create(array(
 
+            "description" => $user->nom . " " . $prix,
+            "amount" => $prix,
+            "currency" => ["iso" => "XOF"],
+            "callback_url" => $url,
+            "customer" => [
+                "firstname" =>$tab[0],
+                "lastname" =>$tab[1],
+                "email" => $user->email,
+                "phone_number" => [
+                    "number" => $user->telephone,
+                    "country" => "bj"
+                ]
+            ]
+        ));
+
+    
+        $token = $transaction->generateToken(); 
+    
+        return response()->json(['url' => $token->url, 'commande' => $vente], 200);
+    }
+    
     public function savePayment(Request $request) {
        
         $validator = Validator::make($request->all(), [
@@ -277,148 +298,351 @@ class CommandeController extends Controller
               return response([
                      'errors' => $validator->errors(),
               ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
-          }
-          
+            }
           
             try {
-        \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
-        \FedaPay\FedaPay::setEnvironment('sandbox');
-    
-        $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
-
-        if ($transaction->status !== "approved") {
-                return response(['error' => 'Transaction echouée'], 404);
-        } 
-
-
-        if(empty($request->produit_id)){
-            $token = $request->header('Authorization');
-            $paniers = Panier::where('token', $token)->get();
-       
-                if(!$paniers){
-                    return response(['message' => 'Panier vide', 404]);
-                }
+            \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+            \FedaPay\FedaPay::setEnvironment('sandbox');
         
-            $idsDansLePanier = [];
-            $nomProduits= "" ;
-           foreach ($paniers  as $item) {
-                $idsDansLePanier[] = $item->idProduit;
-                $nomProduits .= $item->nomProduit.' \ ';
-             } 
-            $produits=$idsDansLePanier;
-            $listeProduit = $nomProduits;
+            $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
 
-       
-        }
-        else{
+            if ($transaction->status !== "approved") {
+                    return response(['error' => 'Transaction echouée'], 404);
+            } 
 
-            $produits =$request->produit_id;
 
-            $listeProduit = Produit::find($request->produit_id)->nom;
-        } 
-         
-        $vente = Commande::where('order_id', $request->order_id)->first();
+            if(empty($request->produit_id)){
+                $token = $request->header('Authorization');
+                $paniers = Panier::where('token', $token)->get();
         
-         
-        if($vente && $transaction->status == 'approved'){
+                    if(!$paniers){
+                        return response(['message' => 'Panier vide', 404]);
+                    }
+            
+                $idsDansLePanier = [];
+                $nomProduits= "" ;
+            foreach ($paniers  as $item) {
+                    $idsDansLePanier[] = $item->idProduit;
+                    $nomProduits .= $item->nomProduit.' \ ';
+                } 
+                $produits=$idsDansLePanier;
+                $listeProduit = $nomProduits;
 
-
-                $nbreProduitsManuel = automatisationController::getnbreProduitsManuel($idsDansLePanier);
-
-                if($nbreProduitsManuel == 0) {
-                        $contenuMail= "";
-                        $user = auth('sanctum')->user() ;
-                        
-                        foreach($idsDansLePanier as $id) {
-                            $p = Produit::find($id);
- 
-                            $latestAbonnement = abonnements::where('attribue', 'false')
-                            ->latest('created_at')
-                            ->where('produit_id', $p->id )
-                                ->first();
-
-                                $a = abonnements::where('attribue', 'false')
-                                ->latest('created_at')
-                                ->where('produit_id', $p->id )
-                                    ->count();
-
-                                   
-                                if($a == 3) {
-                                    Mail::to('hello@heimdall-store.com ')
-                                    ->send(new mailpresqueEpuise( $p->nom));
-                                 
-                                }
         
-                                elseif($a == 1) {
-                                    Mail::to('hello@heimdall-store.com ')
-                                    ->send(new mailabonnementEpuise($p->nom));
-                                   
-                                    $p->statut = "Indisponible";
-                                    $p->save();
-         
-                                }  
-                                
-                                $latestAbonnement->nomClient = $user->nom.' '.$user->prenoms;
-                                $latestAbonnement->emailClient = $user->email;
-                                $latestAbonnement->attribue = "true";
-                                $latestAbonnement->dateAchat=now();
-                                $latestAbonnement->save();
-                                
-    
-                              
+            }
+            else{
 
-                                $contenuMail .= '<p style="text-align:center"><strong>'.$p->nom.'</strong></p>
+                $produits =$request->produit_id;
 
-                               '.$latestAbonnement->details.'
-                                
-                                <p>&nbsp;</p>
-                                
-                               
-                                ' ;
-
-                              
-
-
-                        }
-
-                        $vente->box = $request->box;
-                        $vente->status = "Livree";
-                        $vente->save();
-                      
-                        Mail::to($user->email)
-                        ->send(new orderDetailsMail( $user,$contenuMail , $vente ));
-                   
-                        
-                }
-             
-                elseif ($nbreProduitsManuel > 0 ) {
-                  
-                    $vente->box = $request->box;
-                    $vente->status = "En attente"; 
-                    $vente->save();
-                   
-
-                }
-           
-           // Session::forget(app('currentUser')->nom); 
-           $paniers = Panier::where('token', $token)->delete();
-           Mail::to("hello@heimdall-store.com")->send(new orderMail( $vente,$listeProduit));
-            if(Mail::to(app('currentUser')->email)->send(new orderMail( $vente,$listeProduit)))
+                $listeProduit = Produit::find($request->produit_id)->nom;
+            } 
+            
+            $vente = Commande::where('order_id', $request->order_id)->first();
+            
+            
+            if($vente && $transaction->status == 'approved'){
+            
+            // Session::forget(app('currentUser')->nom); 
+            $paniers = Panier::where('token', $token)->delete();
+            Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
+                if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
                 {
-                return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
-                 } else {dd("error");}
-                }
-     
-        
-        else{
-            return response(['error' => 'Commande non trouvé'], 404);
-        }
-
+                    return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
+                } else {dd("error");}
+                    
+            }
+            else{
+                return response(['error' => 'Commande non trouvé'], 404);
+            }
 
         } catch (\FedaPay\Error\Base $e) {
             return response(['error' => 'Transaction erronée'], 500);
 
         }  
     }
+
+
+    // public function savePayment(Request $request) {
+       
+    //     $validator = Validator::make($request->all(), [
+    //          "idTransaction" => 'required', 
+    //          "order_id" => 'required'
+    //        ]);
+           
+    //         if ($validator->fails()) {
+    //           return response([
+    //                  'errors' => $validator->errors(),
+    //           ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
+    //       }
+          
+          
+    //         try {
+    //     \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+    //     \FedaPay\FedaPay::setEnvironment('sandbox');
+    
+    //     $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
+
+    //     if ($transaction->status !== "approved") {
+    //             return response(['error' => 'Transaction echouée'], 404);
+    //     } 
+
+
+    //     if(empty($request->produit_id)){
+    //         $token = $request->header('Authorization');
+    //         $paniers = Panier::where('token', $token)->get();
+       
+    //             if(!$paniers){
+    //                 return response(['message' => 'Panier vide', 404]);
+    //             }
+        
+    //         $idsDansLePanier = [];
+    //         $nomProduits= "" ;
+    //        foreach ($paniers  as $item) {
+    //             $idsDansLePanier[] = $item->idProduit;
+    //             $nomProduits .= $item->nomProduit.' \ ';
+    //          } 
+    //         $produits=$idsDansLePanier;
+    //         $listeProduit = $nomProduits;
+
+       
+    //     }
+    //     else{
+
+    //         $produits =$request->produit_id;
+
+    //         $listeProduit = Produit::find($request->produit_id)->nom;
+    //     } 
+         
+    //     $vente = Commande::where('order_id', $request->order_id)->first();
+        
+         
+    //     if($vente && $transaction->status == 'approved'){
+
+
+    //             // $nbreProduitsManuel = automatisationController::getnbreProduitsManuel($idsDansLePanier);
+
+    //             // if($nbreProduitsManuel == 0) {
+    //             //         $contenuMail= "";
+    //             //         $user = auth('sanctum')->user() ;
+                        
+    //             //         foreach($idsDansLePanier as $id) {
+    //             //             $p = Produit::find($id);
+ 
+    //             //             $latestAbonnement = abonnements::where('attribue', 'false')
+    //             //             ->latest('created_at')
+    //             //             ->where('produit_id', $p->id )
+    //             //                 ->first();
+
+    //             //                 $a = abonnements::where('attribue', 'false')
+    //             //                 ->latest('created_at')
+    //             //                 ->where('produit_id', $p->id )
+    //             //                     ->count();
+
+                                   
+    //             //                 if($a == 3) {
+    //             //                     Mail::to('hello@heimdall-store.com ')
+    //             //                     ->send(new mailpresqueEpuise( $p->nom));
+                                 
+    //             //                 }
+        
+    //             //                 elseif($a == 1) {
+    //             //                     Mail::to('hello@heimdall-store.com ')
+    //             //                     ->send(new mailabonnementEpuise($p->nom));
+                                   
+    //             //                     $p->statut = "Indisponible";
+    //             //                     $p->save();
+         
+    //             //                 }  
+                                
+    //             //                 $latestAbonnement->nomClient = $user->nom.' '.$user->prenoms;
+    //             //                 $latestAbonnement->emailClient = $user->email;
+    //             //                 $latestAbonnement->attribue = "true";
+    //             //                 $latestAbonnement->dateAchat=now();
+    //             //                 $latestAbonnement->save();
+                                
+    
+                              
+
+    //             //                 $contenuMail .= '<p style="text-align:center"><strong>'.$p->nom.'</strong></p>
+
+    //             //                '.$latestAbonnement->details.'
+                                
+    //             //                 <p>&nbsp;</p>
+                                
+                               
+    //             //                 ' ;
+
+                              
+
+
+    //             //         }
+
+    //             //         $vente->box = $request->box;
+    //             //         $vente->status = "Livree";
+    //             //         $vente->save();
+                      
+    //             //         Mail::to($user->email)
+    //             //         ->send(new orderDetailsMail( $user,$contenuMail , $vente ));
+                   
+                        
+    //             // }
+             
+    //             // elseif ($nbreProduitsManuel > 0 ) {
+                  
+    //             //     $vente->box = $request->box;
+    //             //     $vente->status = "En attente"; 
+    //             //     $vente->save();
+                   
+
+    //             // }
+           
+    //        // Session::forget(app('currentUser')->nom); 
+    //        $paniers = Panier::where('token', $token)->delete();
+    //        Mail::to("hello@heimdall-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
+    //         if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
+    //         {
+    //             return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
+    //         } else {dd("error");}
+                
+    //     }
+    //     else{
+    //         return response(['error' => 'Commande non trouvé'], 404);
+    //     }
+
+
+    //     } catch (\FedaPay\Error\Base $e) {
+    //         return response(['error' => 'Transaction erronée'], 500);
+
+    //     }  
+    // }
+
+    // public function payments(Request $request ){
+  
+    //     if($request->codepromo !== "UNDEFINED"){
+           
+    //         $promo = codePromo::where('intitule', $request->input('codepromo'))->first();
+            
+    //             if($promo && $promo->nombreUtilisation > 0){
+    //                 $codePromo =$request->codepromo ;
+    //                 $promo->nombreUtilisation =  $promo->nombreUtilisation - 1;
+    //                 $promo ->save();
+                 
+    //                 if(!$request->idProduit) {
+    //                        $url="https://mrapple-store.com/panier";
+    //         $token = $request->header('Authorization');
+    //         $paniers = Panier::where('token', $token)->get();
+    //         $prix = 0;
+    //          $qty= 0;
+    //          $idsDansLePanier = [];
+            
+    //        foreach ($paniers  as $produit) {
+              
+    //             $qty += $produit->qty;
+                
+    //              $prix += $produit->prix *  $qty;
+    //             $idsDansLePanier[] =["id" =>$produit->idProduit, "qty" =>$produit->qty];
+    //          }
+    //           $produits=$idsDansLePanier;
+           
+    //           $prix = $prix - $promo->valeur * $prix /100;
+                      
+    //                 }
+    //                 else {
+    //                        $url="https://mrapple-store.com/payment";
+    //         $produit=Produit::findorfail($request->idProduit);
+    //         $produits[]=["id" =>$produit->id, "qty" =>$produit->quantite];
+    //         $prix =$produit->prix; 
+    //         $qty = 1;
+                       
+    //                     $prix = $prix - $promo->valeur * $prix /100;
+    //                 }
+    //             }
+    //             else 
+    //             {
+    //                 return response()->json(['erreur' => "Code promo errone ou code épuisé "]);
+    //             }
+    //     } 
+    //     else {
+       
+    //         $codePromo=null;
+    //         if(!$request->idProduit ) {
+    //             $url="https://mrapple-store.com/panier";
+    //             $token = $request->header('Authorization');
+    //             $paniers = Panier::where('token', $token)->get();
+    //             $prix = 0;
+    //             $qty= 0;
+    //             $idsDansLePanier = [];
+    //         foreach ($paniers  as $produit) {
+    //                 $qty += $produit->qty;
+    //                 $prix += $produit->prix *  $produit->qty;
+    //                 $idsDansLePanier[] =["id" =>$produit->idProduit, "qty" =>$produit->qty];
+    //             }
+    //             $produits=$idsDansLePanier;
+    
+    //         }
+    //         // else {
+                
+    //         //         $url="https://mrapple-store.com/payement";
+    //         //     $produit=Produit::findorfail($request->idProduit);
+    //         //     $produits[]=["id" =>$produit->id, "qty" =>$produit->quantite];
+    //         //     $prix =$produit->prix; 
+    //         //     $qty = 1;
+    //         // }
+ 
+    //     }
+      
+       
+    //     $prefix = 'MRAPPLE_ORDER-';
+    //     $randomNumber = mt_rand(1000, 9999); 
+    //     $orderID = $prefix . $randomNumber;
+    //    $produits_serialized = json_encode($produits);
+
+      
+    //     $vente=Commande::create([
+    //         'order_id' => $orderID,
+    //         'codePromo' => $codePromo ? $codePromo : null,
+    //         'produit_id'=> $produits_serialized ,
+    //         'prix_total' => $prix ,
+    //         'status' => "Unpaid",
+    //         'quantite' => $qty ,
+    //         'user_id' => app('currentUser')->id,
+    //         'user_name' => app('currentUser')->nom.' '.app('currentUser')->prenoms,
+    //         'date_created'=> Carbon::now()
+    //       ]);
+         
+    //     //  $_SESSION[app('currentUser')->nom]=$vente->order_id; 
+          
+
+ 
+    //      /* Rempacez VOTRE_CLE_API par votre véritable clé API */
+    //     \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+    //      // \FedaPay\FedaPay::setApiKey("sk_sandbox_mGVNXupMPNzgS08eH8BGsJlo");
+    //    /* Précisez si vous souhaitez exécuter votre requête en mode test ou live */
+    //        \FedaPay\FedaPay::setEnvironment('sandbox'); //ou setEnvironment('live');
+ 
+    //        /* Créer la transaction */ 
+    //       $transaction = \FedaPay\Transaction::create(array(
+    //        "description" =>   app('currentUser')->nom." ".$prix,
+    //        "amount" => $prix,
+    //        "currency" => ["iso" => "XOF"],
+    //        "callback_url" => $url,
+    //        "customer" => [
+    //            "firstname" =>app('currentUser')->nom,
+    //         //    "lastname" => app('currentUser')->prenoms,
+    //            "email" => app('currentUser')->email,
+    //            "phone_number" => [
+    //                "number" => app('currentUser')->telephone,
+    //                "country" => "bj"
+    //            ]
+    //        ]
+    //        ));
+           
+          
+    //        $token = $transaction->generateToken(); 
+           
+    //        return response()->json(['url' => $token->url, 'commande'=> $vente], 200);
+        
+          
+    // }
 
 }
