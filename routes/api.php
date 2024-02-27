@@ -169,9 +169,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/total-commandes', [CommandeController::class, 'nbrTotalCommandes']);
         
-    Route::post('/valider', [CommandeController::class, 'validercommande']);
-
-    Route::get('/payer', [CommandeController::class, 'payer']);
+    Route::post('/valider-commande', [CommandeController::class, 'validercommande']);
 
     Route::post('/payment', [CommandeController::class, 'payment']);
     

@@ -31,7 +31,7 @@ class TradeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nouveau trade ajouté',
+            subject: 'Nouveau demande de trade ajouté',
         );
     }
 

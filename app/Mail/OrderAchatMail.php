@@ -42,10 +42,11 @@ class OrderAchatMail extends Mailable
      */
     public function content(): Content
     {
-        $this->user =app('currentUser');
+        // $this->user =app('currentUser');
+        $user = auth('sanctum')->user();
     
         return (new Content)
-        ->view('emails/orderAchatMail',[ 'vente' =>$this->vente, 'produit' => $this->produit, 'user'=>$this->user]);
+        ->view('emails/orderAchatMail',[ 'vente' =>$this->vente, 'produit' => $this->produit, 'user'=>$user]);
      
     }
 

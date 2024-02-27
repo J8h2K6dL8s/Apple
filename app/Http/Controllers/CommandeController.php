@@ -148,7 +148,7 @@ class CommandeController extends Controller
                          $user= User::where('id', $commande->user_id)->first();
                         
                         if(Mail::to($user->email)->send(new OrderDetailsMail( $user,$data, $commande))){
-                                 return response(['message' => "Details envoyé ".$user->email], 200);
+                                 return response(['message' => "Details envoyé à ".$user->email], 200);
                          } 
              
                        }
@@ -164,7 +164,7 @@ class CommandeController extends Controller
 
     public function nombreCommandesEnAttente()
     {
-        $nombreEnAttente = Commande::where('status', 'en_attente')->count();
+        $nombreEnAttente = Commande::where('status', 'En attente')->count();
         
         return response()->json(['message' => "Le nombre de commande en attente est : " . $nombreEnAttente], 200);
     }
@@ -287,80 +287,154 @@ class CommandeController extends Controller
         return response()->json(['url' => $token->url, 'commande' => $vente], 200);
     }
     
-    public function savePayment(Request $request) {
+    // public function savePayment(Request $request) {
        
+    //     $validator = Validator::make($request->all(), [
+    //          "idTransaction" => 'required', 
+    //          "order_id" => 'required'
+    //        ]);
+           
+    //         if ($validator->fails()) {
+    //           return response([
+    //                  'errors' => $validator->errors(),
+    //           ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
+    //         }
+          
+    //         try {
+    //         \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+    //         \FedaPay\FedaPay::setEnvironment('sandbox');
+        
+    //         $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
+
+    //         if ($transaction->status !== "approved") {
+    //                 return response(['error' => 'Transaction echouée'], 404);
+    //         } 
+
+
+    //         if(empty($request->produit_id)){
+    //             $token = $request->header('Authorization');
+    //             $paniers = Panier::where('token', $token)->get();
+        
+    //                 if(!$paniers){
+    //                     return response(['message' => 'Panier vide', 404]);
+    //                 }
+            
+    //             $idsDansLePanier = [];
+    //             $nomProduits= "" ;
+    //         foreach ($paniers  as $item) {
+    //                 $idsDansLePanier[] = $item->idProduit;
+    //                 $nomProduits .= $item->nomProduit.' \ ';
+    //             } 
+    //             $produits=$idsDansLePanier;
+    //             $listeProduit = $nomProduits;
+
+        
+    //         }
+    //         else{
+
+    //             $produits =$request->produit_id;
+
+    //             $listeProduit = Produit::find($request->produit_id)->nom;
+    //         } 
+            
+    //         $vente = Commande::where('order_id', $request->order_id)->first();
+            
+            
+    //         if($vente && $transaction->status == 'approved'){
+            
+    //         // Session::forget(app('currentUser')->nom); 
+    //         $paniers = Panier::where('token', $token)->delete();
+    //         Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
+    //             if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
+    //             {
+    //                 return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
+    //             } else {dd("error");}
+                    
+    //         }
+    //         else{
+    //             return response(['error' => 'Commande non trouvé'], 404);
+    //         }
+
+    //     } catch (\FedaPay\Error\Base $e) {
+    //         return response(['error' => 'Transaction erronée'], 500);
+
+    //     }  
+    // }
+
+    public function savePayment(Request $request) {
         $validator = Validator::make($request->all(), [
              "idTransaction" => 'required', 
              "order_id" => 'required'
-           ]);
-           
-            if ($validator->fails()) {
-              return response([
-                     'errors' => $validator->errors(),
-              ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
-            }
-          
-            try {
+        ]);
+        
+        if ($validator->fails()) {
+            return response([
+                 'errors' => $validator->errors(),
+            ], 422); // Code de réponse HTTP 422 Unprocessable Entity
+        }
+        
+        try {
             \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
             \FedaPay\FedaPay::setEnvironment('sandbox');
-        
+            
             $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
-
+    
             if ($transaction->status !== "approved") {
-                    return response(['error' => 'Transaction echouée'], 404);
+                return response(['error' => 'Transaction échouée'], 404);
             } 
-
-
+    
+            $user = auth('sanctum')->user(); // Utilisateur actuellement authentifié
+    
             if(empty($request->produit_id)){
                 $token = $request->header('Authorization');
                 $paniers = Panier::where('token', $token)->get();
-        
-                    if(!$paniers){
-                        return response(['message' => 'Panier vide', 404]);
-                    }
             
+                if(!$paniers){
+                    return response(['message' => 'Panier vide'], 404);
+                }
+                
                 $idsDansLePanier = [];
                 $nomProduits= "" ;
-            foreach ($paniers  as $item) {
+                foreach ($paniers  as $item) {
                     $idsDansLePanier[] = $item->idProduit;
                     $nomProduits .= $item->nomProduit.' \ ';
                 } 
                 $produits=$idsDansLePanier;
                 $listeProduit = $nomProduits;
-
-        
             }
             else{
-
                 $produits =$request->produit_id;
-
                 $listeProduit = Produit::find($request->produit_id)->nom;
             } 
-            
+                
             $vente = Commande::where('order_id', $request->order_id)->first();
-            
-            
+                
             if($vente && $transaction->status == 'approved'){
-            
-            // Session::forget(app('currentUser')->nom); 
-            $paniers = Panier::where('token', $token)->delete();
-            Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
-                if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
-                {
-                    return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
-                } else {dd("error");}
-                    
+                // Mise à jour du statut de la commande en "en attente"
+                $vente->status = 'En attente';
+                $vente->save();
+                
+                // Suppression des paniers
+                $paniers = Panier::where('token', $token)->delete();
+    
+                // Envoi du mail à l'adresse de contact
+                Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail($vente, $listeProduit));
+                
+                // Envoi du mail à l'utilisateur
+                if(Mail::to($user->email)->send(new OrderAchatMail($vente, $listeProduit))){
+                    return response(['success' => 'Achat effectué avec succès', 'id'=>$vente->id ], 200);
+                } else {
+                    // Gestion d'une éventuelle erreur lors de l'envoi du mail
+                    return response(['error' => 'Erreur lors de l\'envoi du mail'], 500);
+                }                   
             }
             else{
-                return response(['error' => 'Commande non trouvé'], 404);
+                return response(['error' => 'Commande non trouvée'], 404);
             }
-
         } catch (\FedaPay\Error\Base $e) {
             return response(['error' => 'Transaction erronée'], 500);
-
         }  
     }
-
 
     // public function savePayment(Request $request) {
        
