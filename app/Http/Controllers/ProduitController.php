@@ -27,7 +27,7 @@ class ProduitController extends Controller
     {
         // Chargez le produit avec les variantes associées
         $produit->load('images','variantes');
-
+        $produit->load('variantes.images');
         return response()->json(['produit' => $produit], 200);
     }
 

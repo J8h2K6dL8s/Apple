@@ -11,8 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 class OrderAchatMail extends Mailable
 {
-    public $vente; 
-    public $produit;
+    
     public $user;
 
     use Queueable, SerializesModels;
@@ -21,10 +20,10 @@ class OrderAchatMail extends Mailable
      * Create a new message instance.
      */
 
-    public function __construct($vente,$listeProduit)
+    public function __construct($user)
     {
-        $this->vente=$vente;
-        $this->produit=$listeProduit;
+        $this->user = $user;
+       
     }
 
     /**
@@ -46,7 +45,7 @@ class OrderAchatMail extends Mailable
         $user = auth('sanctum')->user();
     
         return (new Content)
-        ->view('emails/orderAchatMail',[ 'vente' =>$this->vente, 'produit' => $this->produit, 'user'=>$user]);
+        ->view('emails/orderAchatMail',['user'=>$user]);
      
     }
 

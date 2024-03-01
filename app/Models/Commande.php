@@ -28,4 +28,14 @@ class Commande extends Model
         'prix_total',
         'user_name',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // public function produits()
+    // {
+    //     return $this->belongsToMany(Produit::class);
+    // }
 }

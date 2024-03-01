@@ -15,14 +15,18 @@ class TradeMail extends Mailable
 
     public $trade;
     public $user;
+    public $type;
+
     
 
     /**
      * Create a new message instance.
      */
-    public function __construct($trade)
+    public function __construct($trade,$type)
     {
         $this->trade = $trade;
+        $this->type=$type;
+
     }
 
     /**
@@ -40,8 +44,11 @@ class TradeMail extends Mailable
      */
     public function content(): Content
     { 
-        return  (new Content)
+        if ($this->type =='admin') { 
+            return  (new Content)
                 ->view('emails/trade',['trade' =>$this->trade]);
+        }
+
     }
 
     /**

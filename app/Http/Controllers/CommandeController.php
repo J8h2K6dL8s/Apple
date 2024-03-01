@@ -69,45 +69,7 @@ class CommandeController extends Controller
             return response()->json(['message' => 'Commande non trouvée'], 404);
         }
     }
-
-    public function mesCommande(Request $request)
-    {
-        // Récupérer les commandes de l'utilisateur actuel
-        $user = auth('sanctum')->user();
-
-            $commandes = Commande::where('user_id', $user->id)
-                            ->orderBy('id', 'desc')
-                            ->get();
-
-        // $commandes = Commande::where('user_id', app('currentUser')->id)->get();
-
-        // Vérifier si des commandes ont été trouvées
-        if ($commandes->isEmpty()) {
-            // Aucune commande trouvée, retourner un message approprié
-            return response()->json(['message' => 'Aucune commande trouvée pour cet utilisateur.'], 404);
-        }
-
-        // Commandes trouvées, les formater pour la réponse JSON
-        $formattedCommandes = [];
-        foreach ($commandes as $commande) {
-            $formattedCommandes[] = [
-                'order_id' => $commande->order_id,
-                'codePromo' => $commande->codePromo,
-                'produit_id' => json_decode($commande->produit_id, true),
-                'prix_total' => $commande->prix_total,
-                'status' => $commande->status,
-                'quantite' => $commande->quantite,
-                'user_id' => $commande->user_id,
-                'user_name' => $commande->user_name,
-                'date_created' => $commande->date_created
-            ];
-        }
-
-        // Retourner les commandes formatées
-        return response()->json(['commandes' => $formattedCommandes], 200);
-    }
-
-    public function mesCommandes()
+    public function mesCommande()
     {
         $user = auth('sanctum')->user();
 

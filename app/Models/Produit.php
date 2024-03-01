@@ -52,4 +52,14 @@ class Produit extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function varianteImages()
+    {
+        return $this->hasMany(VarianteImage::class);
+    }
+
+    // public function commandes()
+    // {
+    //     return $this->belongsToMany(Commande::class);
+    // }
 }

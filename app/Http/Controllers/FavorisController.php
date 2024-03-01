@@ -45,7 +45,7 @@ class FavorisController extends Controller
 
         // Récupérer la liste des produits favoris de l'utilisateur
         $produitsFavoris = Favoris::where('user_id', $user->id)
-                                ->with('produit') 
+                                ->with('produit.images', 'produit.variantes.images')
                                 ->get();
              
         return response()->json(['produits_favoris' => $produitsFavoris] , 200);

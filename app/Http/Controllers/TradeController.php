@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Trade;
+use App\Mail\TradeMail;
 use App\Models\TradeImage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Mail\TradeMail;
 use Illuminate\Support\Facades\Mail;
 
 class TradeController extends Controller
@@ -64,9 +65,9 @@ class TradeController extends Controller
         // Chargement des images pour le trade actuel
         $trade->load('images');
 
-        Mail::to('contact@mrapple-store.com')->send(new TradeMail($trade));
+        Mail::to('contact@mrapple-store.com')->send(new TradeMail($trade, 'admin'));
 
-        return response()->json(['message' => 'Trade ajouté avec succès', 'trade' => $trade], 201);
+        return response()->json(['message' => 'Votre demande de trade a été ajoutée avec succès', 'trade' => $trade], 201);
     }
 
 }

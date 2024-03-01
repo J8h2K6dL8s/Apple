@@ -161,7 +161,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/liste-commandes', [CommandeController::class, 'index']);
 
-    Route::get('/mes-commandes', [CommandeController::class, 'mesCommandes']);
+    Route::get('/mes-commandes', [CommandeController::class, 'mesCommande']);
 
     Route::get('/voir-commande/{id}', [CommandeController::class, 'show']);
 
