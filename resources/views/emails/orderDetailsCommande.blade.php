@@ -171,7 +171,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
 																<div style="color:#555555;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:19px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:22.8px;">
-																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>{{ $commande->user_name }}</strong>,&nbsp;</p>
+																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>{{$commande->user_name}}</strong>,&nbsp;</p>
 																</div>
 															</td>
 														</tr>
@@ -244,7 +244,7 @@
 																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Details de la commande:</strong></p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N°: </strong>{{ $commande->order_id }}</p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s):</strong></p>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s): </strong></p>
 																	{{-- <ul>
 																		@foreach ($commande->produits as $produit)
 																			<li>{{ $produit->nom }} (Quantité: {{ $produit->quantite }})</li>

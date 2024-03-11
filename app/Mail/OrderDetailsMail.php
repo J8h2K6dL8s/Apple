@@ -12,8 +12,8 @@ use Illuminate\Queue\SerializesModels;
 class OrderDetailsMail extends Mailable
 {
     public $user;
-    public $data;
     public $commande;
+    public $listeProduit;
 
     use Queueable, SerializesModels;
 
@@ -21,11 +21,11 @@ class OrderDetailsMail extends Mailable
      * Create a new message instance.
      */
 
-    public function __construct($user, $data, $commande)
+    public function __construct($user, $commande)
     {
         $this->user = $user;
-        $this->data = $data; 
         $this->commande = $commande ; 
+        // $this->listeProduit = $listeProduit;
     }
 
     /**
@@ -46,7 +46,8 @@ class OrderDetailsMail extends Mailable
     public function content(): Content
     {
         return (new Content)
-        ->view('emails/orderDetailsCommande',['user' =>$this->user, 'data' => $this->data, 'commande' =>$this->commande]);
+        ->view('emails/orderDetailsCommande',['user' =>$this->user, 'commande' =>$this->commande]);
+        // ->view('emails/orderDetailsCommande',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
      
     }
 

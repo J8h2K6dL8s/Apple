@@ -25,4 +25,9 @@ class Panier extends Model
         // 'image',
         'prix'
     ];
+
+    public function produit()
+    {
+        return $this->belongsTo(Produit::class, 'idProduit');
+    }
 }

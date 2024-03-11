@@ -9,24 +9,23 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderAchatMail extends Mailable
+class AnnulerCommandeMail extends Mailable
 {
-    
-    public $vente; 
-    public $listeProduit;
     public $user;
-
+    public $commande;
+    public $listeProduit;
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
 
-     public function __construct($vente,$listeProduit)
-     {
-         $this->vente=$vente;
-         $this->listeProduit=$listeProduit;
-     }
+    public function __construct($user, $commande)
+    {
+        $this->user = $user;
+        $this->commande = $commande ; 
+        // $this->listeProduit = $listeProduit;
+    }
 
     /**
      * Get the message envelope.
@@ -34,7 +33,7 @@ class OrderAchatMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre achat | Mr Apple',
+            subject: 'Annuler Commande Mail | Mr Apple',
         );
     }
 
@@ -43,11 +42,9 @@ class OrderAchatMail extends Mailable
      */
     public function content(): Content
     {
-        // $this->user =app('currentUser');
-        $user = auth('sanctum')->user();
-    
         return (new Content)
-        ->view('emails/orderAchatMail',['vente' =>$this->vente, 'listeProduit' => $this->listeProduit,'user'=>$user]);
+        ->view('emails/annulerCommande',['user' =>$this->user, 'commande' =>$this->commande]);
+        // ->view('emails/orderDetailsCommande',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
      
     }
 

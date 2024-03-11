@@ -12,53 +12,47 @@ use App\Models\Cart;
 class PanierController extends Controller
 {
 
-    public function addcart(Request $request, $id) {
+    public function addcart(Request $request, $idProduit, $idVariante = null) {
         $token = $request->header('Authorization');
-        $paniers = Panier::where('token', $token)->get(); 
-        $ids = Panier::where('token', $token)->pluck('idProduit')->toArray();
+        $panier = Panier::where('token', $token)
+                        ->where('idProduit', $idProduit)
+                        ->where('idVariante', $idVariante)
+                        ->first();
     
-        $product=Produit::find($id);
+        $produit = Produit::find($idProduit);
         
-        if($product) {
-            // Vérifier si la variante est spécifiée
-            $idVariante = $request->input('idVariante');
-            $prix = $product->prix; 
+        if ($produit) {
+            $prix = $produit->prix; 
+            $nomProduit = $produit->nom;
+            $message = "Produit ajouté au panier";
     
             if ($idVariante) {
                 $variante = Variante::find($idVariante);
-                if ($variante && $variante->produit_id == $id) { 
-                    $prix = $variante->prix; // Utilisez le prix de la variante
+                if ($variante && $variante->produit_id == $idProduit) { 
+                    $prix = $variante->prix;
+                    $nomProduit = $variante->produit->nom;
+                    $message = "Variante ajoutée au panier";
                 }
             }
     
-            if(count($paniers) !== 0) {
-                if(in_array($product->id, $ids)) {
-                    $pdt = Panier::where('idProduit', $product->id)->first();
-                    $pdt->qty += 1;
-                    // $pdt->prix = $prix * $pdt->qty; 
-                    $pdt->save();
-                    return response(["message"=> "Produit ajouté" ], 200);
-                } else {
-                    Panier::create([
-                        'token' => $token,
-                        'idProduit' => $product->id,
-                        'idVariante' => $idVariante,
-                        'nomProduit' => $product->nom,
-                        'qty' => 1,
-                        'prix' => $prix 
-                    ]);
-                    return response(["message"=> "Produit ajouté" ], 200);
-                }
+            if ($panier) {
+                $panier->qty += 1;
+                $panier->save();
             } else {
-                Panier::create([
+                $panier = Panier::create([
                     'token' => $token,
-                    'idProduit' => $product->id,
-                    'nomProduit' => $product->nom,
+                    'idProduit' => $idProduit,
+                    'idVariante' => $idVariante,
+                    'nomProduit' => $nomProduit,
                     'qty' => 1,
-                    'prix' => $prix
+                    'prix' => $prix 
                 ]);
-                return response(["message"=> "Produit ajouté" ], 200);
             }
+    
+            return response([
+                "message"=> $message,
+                "panier" => $panier
+            ], 200);
         } else {
             return response(["message"=>"Produit non trouvé"], 404);
         }
@@ -67,7 +61,7 @@ class PanierController extends Controller
     public function recupererContenuPanier(Request $request)
     {   
         $token = $request->header('Authorization');  
-        $paniers = Panier::where('token', $token)->get();
+        $paniers = Panier::where('token', $token)->with('produit.images')->get();
 
         $prixTotal = 0;
 
@@ -120,6 +114,73 @@ class PanierController extends Controller
         // return redirect()->route('panier.index')->with('success', 'Quantité mise à jour avec succès');
     }
     
+    // public function addcart(Request $request, $id) {
+    //     $token = $request->header('Authorization');
+    //     $paniers = Panier::where('token', $token)->get(); 
+    //     $ids = Panier::where('token', $token)->pluck('idProduit')->toArray();
+    
+    //     $product=Produit::find($id);
+        
+    //     if($product) {
+    //         // Vérifier si la variante est spécifiée
+    //         $idVariante = $request->input('idVariante');
+    //         $prix = $product->prix; 
+    
+    //         if ($idVariante) {
+    //             $variante = Variante::find($idVariante);
+    //             if ($variante && $variante->produit_id == $id) { 
+    //                 $prix = $variante->prix; // Utilisez le prix de la variante
+    //             }
+    //         }
+    
+    //         if(count($paniers) !== 0) {
+    //             if(in_array($product->id, $ids)) {
+    //                 $pdt = Panier::where('idProduit', $product->id)->first();
+    //                 $pdt->qty += 1;
+    //                 // $pdt->prix = $prix * $pdt->qty; 
+    //                 $pdt->save();
+    //                 return response(["message"=> "Produit ajouté" ], 200);
+    //             } else {
+    //                 Panier::create([
+    //                     'token' => $token,
+    //                     'idProduit' => $product->id,
+    //                     'idVariante' => $idVariante,
+    //                     'nomProduit' => $product->nom,
+    //                     'qty' => 1,
+    //                     'prix' => $prix 
+    //                 ]);
+    //                 return response(["message"=> "Produit ajouté" ], 200);
+    //             }
+    //         } else {
+    //             Panier::create([
+    //                 'token' => $token,
+    //                 'idProduit' => $product->id,
+    //                 'nomProduit' => $product->nom,
+    //                 'qty' => 1,
+    //                 'prix' => $prix
+    //             ]);
+    //             return response(["message"=> "Produit ajouté" ], 200);
+    //         }
+    //     } else {
+    //         return response(["message"=>"Produit non trouvé"], 404);
+    //     }
+    // }
+
+    // public function recupererContenuPanier(Request $request)
+    // {   
+    //     $token = $request->header('Authorization');  
+    //     $paniers = Panier::where('token', $token)->get();
+
+    //     $prixTotal = 0;
+
+    //     // Parcourez tous les paniers de l'utilisateur
+    //     foreach ($paniers as $produit) {
+    //         $prixTotal += $produit->prix * $produit->qty;
+    //     }
+        
+    //     // Répondez avec le contenu du panier et le prix total
+    //     return response()->json(['paniers' => $paniers, 'prixTotal' => $prixTotal]);
+    // }
 
         
 }

@@ -171,7 +171,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
 																<div style="color:#555555;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:19px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:22.8px;">
-																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>{{ $commande->user_name }}</strong>,&nbsp;</p>
+																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>{{$commande->user_name}}</strong>,&nbsp;</p>
 																</div>
 															</td>
 														</tr>
@@ -180,7 +180,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
 																<div style="color:#181818;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:15px;line-height:150%;text-align:center;mso-line-height-alt:22.5px;">
-																	<p style="margin: 0;">Votre commande n°{{$commande->order_id}} &nbsp;est maintenant validée avec succès.</p>
+																	<p style="margin: 0;">Votre commande N° {{$commande->order_id}} &nbsp;est maintenant validée avec succès.</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;">Voici les détails de la commande :</p>
 																</div>
@@ -243,13 +243,13 @@
 															<td class="pad">
 																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Details de la commande:</strong></p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N°: </strong>{{ $commande->order_id }}<</p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s):</strong></p>
-																	<ul>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N°: </strong>{{ $commande->order_id }}</p>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s): {{ $produit }}</strong></p>
+																	{{-- <ul>
 																		@foreach ($commande->produits as $produit)
 																			<li>{{ $produit->nom }} (Quantité: {{ $produit->quantite }})</li>
 																		@endforeach
-																	</ul>
+																	</ul> --}}
 																	{{-- <p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; produit 2,&nbsp; produit 2,&nbsp; produit 2</p> --}}
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date d'achat: </strong>{{now()->format('d-m-Y')}}</p>
 																	<p style="margin: 0;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Montant total: </strong>{{ $commande->prix_total }} FCFA</p>
@@ -391,10 +391,10 @@
 																		<td class="alignment" style="vertical-align: middle; text-align: center;"><!--[if vml]><table align="center" cellpadding="0" cellspacing="0" role="presentation" style="display:inline-block;padding-left:0px;padding-right:0px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;"><![endif]-->
 																			<!--[if !vml]><!-->
 																			<table class="icons-inner" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: inline-block; margin-right: -4px; padding-left: 0px; padding-right: 0px;" cellpadding="0" cellspacing="0" role="presentation"><!--<![endif]-->
-																				<tr>
+																				{{-- <tr>
 																					<td style="vertical-align: middle; text-align: center; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 6px;"><a href="http://designedwithbeefree.com/" target="_blank" style="text-decoration: none;"><img class="icon" alt="Beefree Logo" src="https://d1oco4z2z1fhwp.cloudfront.net/assets/Beefree-logo.png" height="32" width="34" align="center" style="display: block; height: auto; margin: 0 auto; border: 0;"></a></td>
 																					<td style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: undefined; color: #1e0e4b; vertical-align: middle; letter-spacing: undefined; text-align: center;"><a href="http://designedwithbeefree.com/" target="_blank" style="color: #1e0e4b; text-decoration: none;">Designed with Beefree</a></td>
-																				</tr>
+																				</tr> --}}
 																			</table>
 																		</td>
 																	</tr>

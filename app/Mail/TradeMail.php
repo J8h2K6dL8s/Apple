@@ -16,6 +16,7 @@ class TradeMail extends Mailable
     public $trade;
     public $user;
     public $type;
+    public $url;
 
     
 
@@ -35,7 +36,7 @@ class TradeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nouveau demande de trade ajouté',
+            subject: 'Nouvelle demande de trade ajouté',
         );
     }
 
@@ -45,9 +46,10 @@ class TradeMail extends Mailable
     public function content(): Content
     { 
         if ($this->type =='admin') { 
-            return  (new Content)
-                ->view('emails/trade',['trade' =>$this->trade]);
+            $this->url="https://mrapple-store.com/admin/login"; 
         }
+        return  (new Content)
+        ->view('emails/trade',['trade' =>$this->trade,'url' => $this->url]);
 
     }
 

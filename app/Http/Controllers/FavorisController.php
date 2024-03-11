@@ -59,14 +59,6 @@ class FavorisController extends Controller
             return response()->json(['message' => 'Favori non trouvé'], 404);
         }
 
-        // Vérifiez si l'utilisateur authentifié peut supprimer ce favori (s'il lui appartient, etc.)
-        // $currentUser = app('currentUser');
-        $user = auth('sanctum')->user() ;
-
-        if ($favori->user_id !== $user->id) {
-            return response()->json(['message' => 'Vous n\'avez pas la permission de supprimer ce favori.'], 403);
-        }
-
         // Suppression souple du favori
         $favori->delete();
 

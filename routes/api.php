@@ -128,7 +128,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/ajouter-favoris/{id}', [FavorisController::class, 'ajouterAuxFavoris']);
 
-    Route::get('/supprimer-favoris/{id}', [FavorisController::class, 'supprimerUnFavoris']);
+    Route::get('/supprimer-favoris/{id}', [FavorisController::class, 'delete']);
                     
     Route::get('/mes-favoris', [FavorisController::class, 'mesFavoris']);
 
@@ -150,9 +150,9 @@ Route::middleware(['auth'])->group(function () {
 
                                       //COMMANDES
 
-    Route::get('/ajouter-panier/{id}', [PanierController::class, 'addCart']);
+    Route::get('/ajouter-panier/{id}/{idVariante?}', [PanierController::class, 'addcart']);
 
-    Route::get('/supprimer-panier/{rowId}', [PanierController::class, 'removeCart']);
+    Route::get('/supprimer-panier/{id}', [PanierController::class, 'removeCart']);
 
     Route::get('/contenu-panier', [PanierController::class, 'recupererContenuPanier']);
 
@@ -174,6 +174,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/payment', [CommandeController::class, 'payment']);
     
     Route::post('/enregistrer-paiement', [CommandeController::class, 'savePayment']);
+
+    Route::post('/payer-livraison', [CommandeController::class, 'payer']);
+
 
 
 

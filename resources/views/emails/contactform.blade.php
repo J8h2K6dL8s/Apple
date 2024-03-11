@@ -183,13 +183,13 @@
 																	<p style="margin: 0;">Vous avez reçu un nouveau message depuis le formulaire de contact.</p>
 																	<p style="margin: 0;">Voici les détails du message :</p>
 																	<p style="margin: 0;">&nbsp;</p>
-																	<p style="margin: 0;"><strong>Nom</strong>: {{ $data['nom'] }}</p>
+																	<p style="margin: 0;"><strong>Nom:</strong> {{ $data['nom'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;"><strong>Prénoms: </strong>{{ $data['prenom'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;">&nbsp; &nbsp; <strong>Email:</strong>&nbsp;{{ $data['email'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
-																	<p style="margin: 0;">&nbsp; &nbsp; &nbsp;<strong>Téléphone</strong>: {{ $data['telephone'] }}</p>
+																	{{-- <p style="margin: 0;">&nbsp; &nbsp; &nbsp;<strong>Téléphone</strong>: {{ $data['telephone'] }}</p> --}}
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;">&nbsp;<strong> Contenu du</strong>&nbsp; <strong>Message:</strong></p>
 																	<p style="margin: 0;">&nbsp; &nbsp;{{ $data['message'] }}</p>

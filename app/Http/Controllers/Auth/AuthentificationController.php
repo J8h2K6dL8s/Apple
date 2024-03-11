@@ -325,7 +325,7 @@ class AuthentificationController extends Controller
             'prenom' =>'required',
             'email' => 'required|email',
             'message' => 'required',
-            'telephone'=>'required|'
+            'telephone'=>'nullable|integer'
            ]);
            
             if ($validator->fails()) {
