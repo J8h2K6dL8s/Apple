@@ -25,10 +25,19 @@ class ProduitController extends Controller
 
     public function show(Produit $produit)
     {
-        // Chargez le produit avec les variantes associées
-        $produit->load('images','variantes');
+        $produit->load('images', 'variantes');
         $produit->load('variantes.images');
-        return response()->json(['produit' => $produit], 200);
+
+        if ($produit->categorie) {
+            // Accédez au nom de la catégorie
+            $nomCategorie = $produit->categorie->nom;
+
+            // Retournez le produit avec le nom de la catégorie au lieu de l'ID
+            return response()->json(['produit' => $produit->setAttribute('categorie_nom', $nomCategorie)], 200);
+        } 
+        else {
+            return response()->json(['produit' => $produit], 200);
+        }
     }
 
     public function store(Request $request)
@@ -38,8 +47,8 @@ class ProduitController extends Controller
             'description' => 'required|string',
             'capacite' => 'nullable|integer',
             'unite' => [
-                'required_with:capacite', // L'unité est requise si la capacité est fournie
-                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+                'required_with:capacite', 
+                Rule::in(['Go', 'To']), 
             ], 
             'couleur' => 'nullable|string', 
             'prix' => 'required|integer',

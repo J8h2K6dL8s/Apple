@@ -5,7 +5,8 @@
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]--><!--[if !mso]><!-->
-	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css"><!--<![endif]-->
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css"><!--<![endif]-->
 	<style>
 		* {
 			box-sizing: border-box;
@@ -170,7 +171,7 @@
 													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
-																<div style="color:#555555;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:19px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:22.8px;">
+																<div style="color:#555555;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:19px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:22.8px;">
 																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>{{$commande->user_name}}</strong>,&nbsp;</p>
 																</div>
 															</td>
@@ -179,7 +180,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
-																<div style="color:#181818;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:15px;line-height:150%;text-align:center;mso-line-height-alt:22.5px;">
+																<div style="color:#181818;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:15px;font-weight:400;line-height:150%;text-align:center;mso-line-height-alt:22.5px;">
 																	<p style="margin: 0;">Votre commande N° {{$commande->order_id}} &nbsp;est maintenant validée avec succès.</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;">Voici les détails de la commande :</p>
@@ -219,11 +220,12 @@
 													<table class="paragraph_block block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad">
-																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:justify;mso-line-height-alt:19.2px;">
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Commande de:&nbsp;</strong></p>
-																	<p style="margin: 0; margin-bottom: 16px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{$commande->user_name}}<strong>&nbsp;</strong></p>
+																	<p style="margin: 0; margin-bottom: 16px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{$commande->user_name}}&nbsp;</strong></p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Tel: </strong>{{$commande->user->telephone}}<strong> &nbsp;</strong></p>
-																	<p style="margin: 0;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Email: </strong>{{$commande->user->email}}<strong> </strong></p>
+																	<p style="margin: 0;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Email: </strong><strong> </strong></p>
+																	<p style="margin: 0; margin-bottom: 16px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{{$commande->user->email}}&nbsp;</strong></p>
 																</div>
 															</td>
 														</tr>
@@ -232,7 +234,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad">
-																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">&nbsp;</div>
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">&nbsp;</div>
 															</td>
 														</tr>
 													</table>
@@ -241,16 +243,11 @@
 													<table class="paragraph_block block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad">
-																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:justify;mso-line-height-alt:19.2px;">
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Details de la commande:</strong></p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N°: </strong>{{ $commande->order_id }}</p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s): </strong></p>
-																	{{-- <ul>
-																		@foreach ($commande->produits as $produit)
-																			<li>{{ $produit->nom }} (Quantité: {{ $produit->quantite }})</li>
-																		@endforeach
-																	</ul> --}}
-																	{{-- <p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; produit 2,&nbsp; produit 2,&nbsp; produit 2</p> --}}
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s):</strong></p>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; produit 2,&nbsp; produit 2,&nbsp; produit 2</p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date d'achat: </strong>{{now()->format('d-m-Y')}}</p>
 																	<p style="margin: 0;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Montant total: </strong>{{ $commande->prix_total }} FCFA</p>
 																</div>
@@ -273,31 +270,18 @@
 										<tbody>
 											<tr>
 												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
-													<table class="divider_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-														<tr>
-															<td class="pad" style="padding-top:30px;">
-																<div class="alignment" align="center">
-																	<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-																		<tr>
-																			<td class="divider_inner" style="font-size: 1px; line-height: 1px; border-top: 0px solid #BBBBBB;"><span>&#8202;</span></td>
-																		</tr>
-																	</table>
-																</div>
-															</td>
-														</tr>
-													</table>
-													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+													<table class="paragraph_block block-1" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad">
-																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>Facturé par: </strong>Mr Apple</p>
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>Facturé par : </strong>Mr Apple</p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>IFU:</strong><strong>&nbsp;</strong>0202233412974</p>
 																	<p style="margin: 0;"><strong>Cotonou,Bénin</strong></p>
 																</div>
 															</td>
 														</tr>
 													</table>
-													<table class="divider_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
+													<table class="divider_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 														<tr>
 															<td class="pad" style="padding-top:30px;">
 																<div class="alignment" align="center">
@@ -357,7 +341,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:30px;padding-left:40px;padding-right:40px;padding-top:20px;">
-																<div style="color:#fff;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:12px;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
+																<div style="color:#fff;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:12px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
 																	<p style="margin: 0;"><strong>Téléphone:</strong> +229 66 29 86 36 / 97 19 54 79</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;"><strong>Email:</strong> <a href="mailto:hello@uppersoftgroup.com" target="_blank" rel="noopener" style="text-decoration: underline; color: #ffffff;">contact@mrapple-store.com</a></p>

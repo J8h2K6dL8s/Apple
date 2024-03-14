@@ -112,6 +112,9 @@ class CommandeController extends Controller
                     $commande->save();
                     $user = User::find($commande->user_id);
 
+                    // Récupérer les produits associés à la commande
+                    // $produits = $commande->produits;
+
                     // Envoyer un e-mail à l'utilisateur
                     Mail::to($user->email)->send(new OrderDetailsMail($user, $commande));
 
@@ -122,50 +125,6 @@ class CommandeController extends Controller
             }
         }
     }
-
-    // public function validercommande(Request $request){
-     
-    //     $validator = Validator::make($request->all(), [
-         
-    //          'order_id' => 'required',
-    //          'status' => 'required|in:Annulee,Livree',
-    //        ]);
- 
-            
-    //      if ($validator->fails()) {
-    //            return response(['errors' => $validator->errors(), ], 422); 
-    //        } 
-    //       else {
-                
-    //          $commande = Commande::where('order_id', $request->order_id)->first();
-    //          if($commande){ 
-                     
-    //              if ($request->status =="Annulee") {
-    //                  $commande->status = $request->status;
-    //                  $commande->save();
-    //                     return response(['message' => "Commande annulée"], 200);
-    //              }
-    //              elseif($request->status =="Livree"){
-    //                      $data = $request->details; 
-    //                      $commande->status = $request->status;
-    //                      $commande->details = $data;
-    //                      $commande->save();
-    //                      $user= User::where('id', $commande->user_id)->first();
-                        
-    //                     if(Mail::to($user->email)->send(new OrderDetailsMail( $user, $commande))){
-    //                              return response(['message' => "Details envoyé à ".$user->email], 200);
-    //                      } 
-             
-    //                    }
-         
-    //          }
-    //              else {
-    //                  return response(['message' => 'Commande non trouvé'], 404);
-    //              }
- 
-            
-    //      }
-    // }
 
     public function nombreCommandesEnAttente()
     {
@@ -240,7 +199,7 @@ class CommandeController extends Controller
             'quantite' => $qty,
             'user_id' => $user->id,
             'user_name' => $user->nom . ' ' . $user->prenoms,
-            'date_created' => now()
+            'date_created' => now()->format('d/m/Y H:i:s')
         ]);
     
         // Création de la transaction
@@ -267,159 +226,81 @@ class CommandeController extends Controller
         $token = $transaction->generateToken(); 
     
         return response()->json(['url' => $token->url, 'commande' => $vente], 200);
-    }    
-
+    }   
+    
     public function savePayment(Request $request) {
-       
+
         $validator = Validator::make($request->all(), [
-             "idTransaction" => 'required', 
+             "idTransaction" => 'required|integer', 
              "order_id" => 'required'
-           ]);
-           
-            if ($validator->fails()) {
-              return response([
-                     'errors' => $validator->errors(),
-              ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
-          }
-          
-          
-            try {
-        \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
-        \FedaPay\FedaPay::setEnvironment('sandbox');
-    
-        $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
-
-        if ($transaction->status !== "approved") {
-                return response(['error' => 'Transaction echouée'], 404);
-        } 
-
-
-        if(empty($request->produit_id)){
-            $token = $request->header('Authorization');
-            $paniers = Panier::where('token', $token)->get();
-       
-                if(!$paniers){
-                    return response(['message' => 'Panier vide', 404]);
-                }
+        ]);
         
-            $idsDansLePanier = [];
-            $nomProduits= "" ;
-           foreach ($paniers  as $item) {
-                $idsDansLePanier[] = $item->idProduit;
-                $nomProduits .= $item->nomProduit.' \ ';
-             } 
-            $produits=$idsDansLePanier;
-            $listeProduit = $nomProduits;
-
-       
+        if ($validator->fails()) {
+            return response([
+                 'errors' => $validator->errors(),
+            ], 422); // Code de réponse HTTP 422 Unprocessable Entity
         }
-        else{
-
-            $produits =$request->produit_id;
-
-            $listeProduit = Produit::find($request->produit_id)->nom;
-        } 
-         
-        $vente = Commande::where('order_id', $request->order_id)->first();
         
-         
-        if($vente && $transaction->status == 'approved'){
-
-
-                // $nbreProduitsManuel = automatisationController::getnbreProduitsManuel($idsDansLePanier);
-
-                // if($nbreProduitsManuel == 0) {
-                //         $contenuMail= "";
-                //         $user = auth('sanctum')->user() ;
-                        
-                //         foreach($idsDansLePanier as $id) {
-                //             $p = Produit::find($id);
+        try {
+            \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+            \FedaPay\FedaPay::setEnvironment('sandbox');
+            
+            $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
  
-                //             $latestAbonnement = abonnements::where('attribue', 'false')
-                //             ->latest('created_at')
-                //             ->where('produit_id', $p->id )
-                //                 ->first();
-
-                //                 $a = abonnements::where('attribue', 'false')
-                //                 ->latest('created_at')
-                //                 ->where('produit_id', $p->id )
-                //                     ->count();
-
-                                   
-                //                 if($a == 3) {
-                //                     Mail::to('hello@heimdall-store.com ')
-                //                     ->send(new mailpresqueEpuise( $p->nom));
-                                 
-                //                 }
-        
-                //                 elseif($a == 1) {
-                //                     Mail::to('hello@heimdall-store.com ')
-                //                     ->send(new mailabonnementEpuise($p->nom));
-                                   
-                //                     $p->statut = "Indisponible";
-                //                     $p->save();
-         
-                //                 }  
-                                
-                //                 $latestAbonnement->nomClient = $user->nom.' '.$user->prenoms;
-                //                 $latestAbonnement->emailClient = $user->email;
-                //                 $latestAbonnement->attribue = "true";
-                //                 $latestAbonnement->dateAchat=now();
-                //                 $latestAbonnement->save();
-                                
+            if ($transaction->status == "approved") {
+                return response(['error' =>$transaction], 404);
+            } 
     
-                              
-
-                //                 $contenuMail .= '<p style="text-align:center"><strong>'.$p->nom.'</strong></p>
-
-                //                '.$latestAbonnement->details.'
-                                
-                //                 <p>&nbsp;</p>
-                                
-                               
-                //                 ' ;
-
-                              
-
-
-                //         }
-
-                //         $vente->box = $request->box;
-                //         $vente->status = "Livree";
-                //         $vente->save();
-                      
-                //         Mail::to($user->email)
-                //         ->send(new orderDetailsMail( $user,$contenuMail , $vente ));
-                   
-                        
-                // }
-             
-                // elseif ($nbreProduitsManuel > 0 ) {
-                  
-                //     $vente->box = $request->box;
-                //     $vente->status = "En attente"; 
-                //     $vente->save();
-                   
-
-                // }
-           
-           // Session::forget(app('currentUser')->nom); 
-           $paniers = Panier::where('token', $token)->delete();
-           Mail::to("hello@heimdall-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
-            if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
-            {
-                return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
-            } else {dd("error");}
+            $user = auth('sanctum')->user(); // Utilisateur actuellement authentifié
+    
+            if(empty($request->produit_id)){
+                $token = $request->header('Authorization');
+                $paniers = Panier::where('token', $token)->get();
+            
+                if(!$paniers){
+                    return response(['message' => 'Panier vide'], 404);
+                }
                 
-        }
-        else{
-            return response(['error' => 'Commande non trouvé'], 404);
-        }
-
-
+                $idsDansLePanier = [];
+                $nomProduits= "" ;
+                foreach ($paniers  as $item) {
+                    $idsDansLePanier[] = $item->idProduit;
+                    $nomProduits .= $item->nomProduit.' \ ';
+                } 
+                $produits=$idsDansLePanier;
+                $listeProduit = $nomProduits;
+            }
+            else{
+                $produits =$request->produit_id;
+                $listeProduit = Produit::find($request->produit_id)->nom;
+            } 
+                
+            $vente = Commande::where('order_id', $request->order_id)->first();
+                
+            if($vente && $transaction->status == 'approved'){
+                // Mise à jour du statut de la commande en "en attente"
+                $vente->status = 'En attente';
+                $vente->save();
+                
+                // Suppression des paniers
+                $paniers = Panier::where('token', $token)->delete();
+    
+                // Envoi du mail à l'adresse de contact
+                Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail($user,$vente, $listeProduit));
+                
+                // Envoi du mail à l'utilisateur
+                if(Mail::to($user->email)->send(new OrderAchatMail($vente,$user, $listeProduit))){
+                    return response(['success' => 'Achat effectué avec succès. Un e-mail a été envoyé à '.$user->email, 'id'=>$vente->id ], 200);
+                } else {
+                    // Gestion d'une éventuelle erreur lors de l'envoi du mail
+                    return response(['error' => 'Erreur lors de l\'envoi du mail'], 500);
+                }                   
+            }
+            else{
+                return response(['error' => 'Commande non trouvée'], 404);
+            }
         } catch (\FedaPay\Error\Base $e) {
             return response(['error' => 'Transaction erronée'], 500);
-
         }  
     }
 
@@ -447,7 +328,7 @@ class CommandeController extends Controller
 
         // Calcul du prix en fonction des produits ou du panier
         if (!$request->has('idProduit')) {
-            $url = "https://mrapple-store.com/payer";
+            // $url = "https://mrapple-store.com/payer";
             $token = $request->header('Authorization');
             $paniers = Panier::where('token', $token)->get();
             foreach ($paniers as $produit) {
@@ -456,7 +337,7 @@ class CommandeController extends Controller
                 $produits[] = ["id" => $produit->idProduit, "qty" => $produit->qty];
             }
         } else {
-            $url = "https://mrapple-store.com/payer";
+            // $url = "https://mrapple-store.com/payer";
             $produit = Produit::findOrFail($request->idProduit);
             $produits[] = ["id" => $produit->id, "qty" => $produit->quantite];
             $prix = $produit->prix;
@@ -482,11 +363,14 @@ class CommandeController extends Controller
             'quantite' => $qty,
             'user_id' => $user->id,
             'user_name' => $user->nom . ' ' . $user->prenoms,
-            'date_created' => now()
+            'date_created' => now()->format('d/m/Y H:i:s')
+
         ]);
 
-        // Retourner la réponse avec l'URL de confirmation de commande et les détails de la commande
-        return response()->json(['confirmation_url' => $url, 'commande' => $vente], 200);
+        // return response()->json(['confirmation_url' => $url, 'commande' => $vente], 200);
+        return response()->json(['message' => 'Votre commande a été enregistrée avec succès.', 'commande' => $vente], 201);
+
+
     }
 
     public function paymentAnciens(Request $request) {

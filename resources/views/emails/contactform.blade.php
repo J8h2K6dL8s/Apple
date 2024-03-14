@@ -5,7 +5,8 @@
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]--><!--[if !mso]><!-->
-	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css"><!--<![endif]-->
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css"><!--<![endif]-->
 	<style>
 		* {
 			box-sizing: border-box;
@@ -133,7 +134,7 @@
 														<tr>
 															<td class="pad" style="width:100%;padding-right:0px;padding-left:0px;">
 																<div class="alignment" align="center" style="line-height:10px">
-																	<div style="max-width: 160px;"><a href="www.example.com" target="_blank" style="outline:none" tabindex="-1"><img src="https://9e7a886ce7.imgdist.com/public/users/Integrators/BeeProAgency/983493_968159/IMG_5798.PNG" style="display: block; height: auto; border: 0; width: 100%;" width="160" alt="Your logo." title="Your logo."></a></div>
+																	<div style="max-width: 160px;"><a href="www.example.com" target="_blank" style="outline:none" tabindex="-1"><img src="https://b8ae18e189.imgdist.com/public/users/Integrators/BeeProAgency/1114077_1099561/IMG_5798.PNG" style="display: block; height: auto; border: 0; width: 100%;" width="160" alt="Your logo." title="Your logo."></a></div>
 																</div>
 															</td>
 														</tr>
@@ -170,28 +171,34 @@
 													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
-																<div style="color:#111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:21px;line-height:120%;text-align:center;mso-line-height-alt:25.2px;">
+																<div style="color:#343434;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:20px;line-height:120%;text-align:center;mso-line-height-alt:24px;">
 																	<p style="margin: 0; word-break: break-word;">Cher <strong>Mr Apple</strong>,</p>
 																</div>
 															</td>
 														</tr>
 													</table>
-													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+														<tr>
+															<td class="pad">
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
+																	<p style="margin: 0;">Vous avez reçu un nouveau message depuis le formulaire de contact.</p>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table class="paragraph_block block-4" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
-																<div style="color:#020202;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:15px;line-height:150%;text-align:center;mso-line-height-alt:22.5px;">
-																	<p style="margin: 0;">Vous avez reçu un nouveau message depuis le formulaire de contact.</p>
+																<div style="color:#020202;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:15px;line-height:150%;text-align:center;mso-line-height-alt:22.5px;">
 																	<p style="margin: 0;">Voici les détails du message :</p>
 																	<p style="margin: 0;">&nbsp;</p>
-																	<p style="margin: 0;"><strong>Nom:</strong> {{ $data['nom'] }}</p>
+																	<p style="margin: 0;"><strong>Nom</strong>: {{ $data['nom'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;"><strong>Prénoms: </strong>{{ $data['prenom'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;">&nbsp; &nbsp; <strong>Email:</strong>&nbsp;{{ $data['email'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
-																	{{-- <p style="margin: 0;">&nbsp; &nbsp; &nbsp;<strong>Téléphone</strong>: {{ $data['telephone'] }}</p> --}}
-																	<p style="margin: 0;">&nbsp;</p>
-																	<p style="margin: 0;">&nbsp;<strong> Contenu du</strong>&nbsp; <strong>Message:</strong></p>
+																	<p style="margin: 0;"><strong>Contenu du</strong>&nbsp; <strong>Message:</strong></p>
 																	<p style="margin: 0;">&nbsp; &nbsp;{{ $data['message'] }}</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																</div>
@@ -245,7 +252,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:30px;padding-left:40px;padding-right:40px;padding-top:20px;">
-																<div style="color:#fff;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:12px;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
+																<div style="color:#fff;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:12px;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
 																	<p style="margin: 0;"><strong>Téléphone:</strong> +229 66 29 86 36 / 97 19 54 79</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;"><strong>Email:</strong> <a href="mailto:hello@uppersoftgroup.com" target="_blank" rel="noopener" style="text-decoration: underline; color: #ffffff;">contact@mrapple-store.com</a></p>

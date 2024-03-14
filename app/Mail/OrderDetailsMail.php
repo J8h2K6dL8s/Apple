@@ -13,7 +13,7 @@ class OrderDetailsMail extends Mailable
 {
     public $user;
     public $commande;
-    public $listeProduit;
+    public $produits;
 
     use Queueable, SerializesModels;
 
@@ -21,11 +21,12 @@ class OrderDetailsMail extends Mailable
      * Create a new message instance.
      */
 
+    // public function __construct($user, $commande, $produits)
     public function __construct($user, $commande)
     {
         $this->user = $user;
         $this->commande = $commande ; 
-        // $this->listeProduit = $listeProduit;
+        // $this->produits = $produits;
     }
 
     /**
@@ -47,7 +48,7 @@ class OrderDetailsMail extends Mailable
     {
         return (new Content)
         ->view('emails/orderDetailsCommande',['user' =>$this->user, 'commande' =>$this->commande]);
-        // ->view('emails/orderDetailsCommande',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
+        // ->view('emails/orderDetailsCommande',['user' =>$this->user, 'commande' =>$this->commande, 'produits' => $this->produits]);
      
     }
 

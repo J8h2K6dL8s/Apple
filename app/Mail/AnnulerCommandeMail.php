@@ -33,7 +33,7 @@ class AnnulerCommandeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Annuler Commande Mail | Mr Apple',
+            subject: 'Annuler Commande | Mr Apple',
         );
     }
 

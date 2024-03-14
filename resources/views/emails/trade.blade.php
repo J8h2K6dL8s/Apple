@@ -6,7 +6,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]--><!--[if !mso]><!-->
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css">
-	<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@100;200;300;400;500;600;700;800;900" rel="stylesheet" type="text/css"><!--<![endif]-->
 	<style>
@@ -174,7 +173,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
 																<div style="color:#555555;font-family:'Merriweather', 'Georgia', serif;font-size:18px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:21.599999999999998px;">
-																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>Madame / Monsieur</strong>,&nbsp;</p>
+																	<p style="margin: 0; word-break: break-word;">Bonjour <strong>SYLLA Arlette</strong>,&nbsp;</p>
 																</div>
 															</td>
 														</tr>
@@ -182,7 +181,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:40px;padding-right:40px;padding-top:10px;">
-																<div style="color:#0b0b0b;font-family:'Cabin', Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:17px;font-weight:400;line-height:150%;text-align:center;mso-line-height-alt:25.5px;">
+																<div style="color:#0b0b0b;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:17px;font-weight:400;line-height:150%;text-align:center;mso-line-height-alt:25.5px;">
 																	<p style="margin: 0;">Une nouvelle demande de trade a été ajouté avec succès.</p>
 																</div>
 															</td>
@@ -233,7 +232,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad">
-																<div style="color:#101112;direction:ltr;font-family:'Cabin', Arial, 'Helvetica Neue', Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
+																<div style="color:#101112;direction:ltr;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
 																	<p style="margin: 0;">Veuillez vous connecter pour accéder à toutes les informations <span style="font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif background-color: transparent;">sur ce trade.</span></p>
 																</div>
 															</td>
@@ -311,7 +310,7 @@
 													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
 															<td class="pad" style="padding-bottom:30px;padding-left:40px;padding-right:40px;padding-top:20px;">
-																<div style="color:#fff;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:12px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
+																<div style="color:#fff;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;font-size:12px;font-weight:400;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
 																	<p style="margin: 0;"><strong>Téléphone:</strong> +229 66 29 86 36 / 97 19 54 79</p>
 																	<p style="margin: 0;">&nbsp;</p>
 																	<p style="margin: 0;"><strong>Email:</strong> <a href="mailto:hello@uppersoftgroup.com" target="_blank" rel="noopener" style="text-decoration: underline; color: #ffffff;">contact@mrapple-store.com</a></p>

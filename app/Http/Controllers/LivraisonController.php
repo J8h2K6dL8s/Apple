@@ -277,6 +277,204 @@ class LivraisonController extends Controller
           
     }
 
+    // public function validercommande(Request $request){
+     
+    //     $validator = Validator::make($request->all(), [
+         
+    //          'order_id' => 'required',
+    //          'status' => 'required|in:Annulee,Livree',
+    //        ]);
+ 
+            
+    //      if ($validator->fails()) {
+    //            return response(['errors' => $validator->errors(), ], 422); 
+    //        } 
+    //       else {
+                
+    //          $commande = Commande::where('order_id', $request->order_id)->first();
+    //          if($commande){ 
+                     
+    //              if ($request->status =="Annulee") {
+    //                  $commande->status = $request->status;
+    //                  $commande->save();
+    //                     return response(['message' => "Commande annulée"], 200);
+    //              }
+    //              elseif($request->status =="Livree"){
+    //                      $data = $request->details; 
+    //                      $commande->status = $request->status;
+    //                      $commande->details = $data;
+    //                      $commande->save();
+    //                      $user= User::where('id', $commande->user_id)->first();
+                        
+    //                     if(Mail::to($user->email)->send(new OrderDetailsMail( $user, $commande))){
+    //                              return response(['message' => "Details envoyé à ".$user->email], 200);
+    //                      } 
+             
+    //                    }
+         
+    //          }
+    //              else {
+    //                  return response(['message' => 'Commande non trouvé'], 404);
+    //              }
+ 
+            
+    //      }
+    // }
+
+    public function savePayments(Request $request) {
+       
+        $validator = Validator::make($request->all(), [
+             "idTransaction" => 'required', 
+             "order_id" => 'required'
+           ]);
+           
+            if ($validator->fails()) {
+              return response([
+                     'errors' => $validator->errors(),
+              ], 422); // Code de r&eacute;ponse HTTP 422 Unprocessable Entity
+          }
+          
+          
+            try {
+        \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
+        \FedaPay\FedaPay::setEnvironment('sandbox');
+    
+        $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
+
+        if ($transaction->status !== "approved") {
+                return response(['error' => 'Transaction echouée'], 404);
+        } 
+
+
+        if(empty($request->produit_id)){
+            $token = $request->header('Authorization');
+            $paniers = Panier::where('token', $token)->get();
+       
+                if(!$paniers){
+                    return response(['message' => 'Panier vide', 404]);
+                }
+        
+            $idsDansLePanier = [];
+            $nomProduits= "" ;
+           foreach ($paniers  as $item) {
+                $idsDansLePanier[] = $item->idProduit;
+                $nomProduits .= $item->nomProduit.' \ ';
+             } 
+            $produits=$idsDansLePanier;
+            $listeProduit = $nomProduits;
+
+       
+        }
+        else{
+
+            $produits =$request->produit_id;
+
+            $listeProduit = Produit::find($request->produit_id)->nom;
+        } 
+         
+        $vente = Commande::where('order_id', $request->order_id)->first();
+        
+         
+        if($vente && $transaction->status == 'approved'){
+
+
+                // $nbreProduitsManuel = automatisationController::getnbreProduitsManuel($idsDansLePanier);
+
+                // if($nbreProduitsManuel == 0) {
+                //         $contenuMail= "";
+                //         $user = auth('sanctum')->user() ;
+                        
+                //         foreach($idsDansLePanier as $id) {
+                //             $p = Produit::find($id);
+ 
+                //             $latestAbonnement = abonnements::where('attribue', 'false')
+                //             ->latest('created_at')
+                //             ->where('produit_id', $p->id )
+                //                 ->first();
+
+                //                 $a = abonnements::where('attribue', 'false')
+                //                 ->latest('created_at')
+                //                 ->where('produit_id', $p->id )
+                //                     ->count();
+
+                                   
+                //                 if($a == 3) {
+                //                     Mail::to('hello@heimdall-store.com ')
+                //                     ->send(new mailpresqueEpuise( $p->nom));
+                                 
+                //                 }
+        
+                //                 elseif($a == 1) {
+                //                     Mail::to('hello@heimdall-store.com ')
+                //                     ->send(new mailabonnementEpuise($p->nom));
+                                   
+                //                     $p->statut = "Indisponible";
+                //                     $p->save();
+         
+                //                 }  
+                                
+                //                 $latestAbonnement->nomClient = $user->nom.' '.$user->prenoms;
+                //                 $latestAbonnement->emailClient = $user->email;
+                //                 $latestAbonnement->attribue = "true";
+                //                 $latestAbonnement->dateAchat=now();
+                //                 $latestAbonnement->save();
+                                
+    
+                              
+
+                //                 $contenuMail .= '<p style="text-align:center"><strong>'.$p->nom.'</strong></p>
+
+                //                '.$latestAbonnement->details.'
+                                
+                //                 <p>&nbsp;</p>
+                                
+                               
+                //                 ' ;
+
+                              
+
+
+                //         }
+
+                //         $vente->box = $request->box;
+                //         $vente->status = "Livree";
+                //         $vente->save();
+                      
+                //         Mail::to($user->email)
+                //         ->send(new orderDetailsMail( $user,$contenuMail , $vente ));
+                   
+                        
+                // }
+             
+                // elseif ($nbreProduitsManuel > 0 ) {
+                  
+                //     $vente->box = $request->box;
+                //     $vente->status = "En attente"; 
+                //     $vente->save();
+                   
+
+                // }
+           
+           // Session::forget(app('currentUser')->nom); 
+           $paniers = Panier::where('token', $token)->delete();
+           Mail::to("hello@heimdall-store.com")->send(new OrderAchatMail( $vente,$listeProduit));
+            if(Mail::to(app('currentUser')->email)->send(new OrderAchatMail( $vente,$listeProduit)))
+            {
+                return response(['success' => 'Achat effectue avec succes', 'id'=>$vente->id ], 200);
+            } else {dd("error");}
+                
+        }
+        else{
+            return response(['error' => 'Commande non trouvé'], 404);
+        }
+
+
+        } catch (\FedaPay\Error\Base $e) {
+            return response(['error' => 'Transaction erronée'], 500);
+
+        }  
+    }
+
     // public function savePayment(Request $request) {
        
     //     $validator = Validator::make($request->all(), [

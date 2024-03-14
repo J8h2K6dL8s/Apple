@@ -17,13 +17,13 @@ class CommandeSeeder extends Seeder
         Commande::create([
             'user_id' => 1,
             'produit_id' => '[{"id":1,"qty":2},{"id":2,"qty":1}]',
-            'order_id' => 'MRAPPLE_ORDER-1234',
+            'order_id' => 'MRAPPLE_ORDER-1050',
             'date_created' => Carbon::now(),
             'status' => 'Unpaid',
             'box' => 'standard',
-            'codePromo' => 'VOTRE_CODE_PROMO',
+            'codePromo' => 'NULL',
             'quantite' => 3,
-            'prix_total' => 150.00,
+            'prix_total' => 200000,
             'user_name' => 'John Doe',
         ]);
     }

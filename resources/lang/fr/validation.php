@@ -85,8 +85,19 @@ return [
         'images.*.file' => 'Les fichiers images doivent être des fichiers valides.',
         'images.*.mimes' => 'Les fichiers images doivent être de type :values.',
         'images.*.max' => 'Les fichiers images ne doivent pas dépasser :max kilo-octets.',
+
+
+        'idTransaction' => [
+            "required"=> "L'ID de transaction est requis.",
+            "integer"=> "L'ID de transaction doit être un entier."
+        ],
+
+        'order_id' => [
+            'required' => "L'ID de commande est requis.",
+        ],
     
     ],
+
 
     
 ];
