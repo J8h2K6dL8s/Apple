@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('type');
             $table->string('valeur');
             $table->integer('prix');
-            $table->string('image');
+            $table->string('unite');
+            $table->string('statut');
             $table->timestamps();
             $table->foreign('produit_id')->references('id')->on('produits')->onDelete('cascade');
             $table->softDeletes();

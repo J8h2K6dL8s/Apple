@@ -12,16 +12,61 @@ use App\Models\Cart;
 class PanierController extends Controller
 {
 
+    // public function addcart(Request $request, $idProduit, $idVariante = null) {
+    //     $token = $request->header('Authorization');
+    //     $panier = Panier::where('token', $token)
+    //                     ->where('idProduit', $idProduit)
+    //                     ->where('idVariante', $idVariante)
+    //                     ->first();
+    
+    //     $produit = Produit::find($idProduit);
+        
+    //     if ($produit) {
+    //         $prix = $produit->prix; 
+    //         $nomProduit = $produit->nom;
+    //         $message = "Produit ajouté au panier";
+    
+    //         if ($idVariante) {
+    //             $variante = Variante::find($idVariante);
+    //             if ($variante && $variante->produit_id == $idProduit) { 
+    //                 $prix = $variante->prix;
+    //                 $nomProduit = $variante->produit->nom;
+    //                 $message = "Variante ajoutée au panier";
+    //             }
+    //         }
+    
+    //         if ($panier) {
+    //             $panier->qty += 1;
+    //             $panier->save();
+    //         } else {
+    //             $panier = Panier::create([
+    //                 'token' => $token,
+    //                 'idProduit' => $idProduit,
+    //                 'idVariante' => $idVariante,
+    //                 'nomProduit' => $nomProduit,
+    //                 'qty' => 1,
+    //                 'prix' => $prix 
+    //             ]);
+    //         }
+    
+    //         return response([
+    //             "message"=> $message,
+    //             "panier" => $panier
+    //         ], 200);
+    //     } else {
+    //         return response(["message"=>"Produit non trouvé"], 404);
+    //     }
+    // }
+
     public function addcart(Request $request, $idProduit, $idVariante = null) {
         $token = $request->header('Authorization');
-        $panier = Panier::where('token', $token)
-                        ->where('idProduit', $idProduit)
-                        ->where('idVariante', $idVariante)
-                        ->first();
-    
         $produit = Produit::find($idProduit);
-        
+    
         if ($produit) {
+            if ($produit->statut != 'Disponible') {
+                return response(["message"=>"Le produit n'est pas disponible pour l'achat"], 400);
+            }
+    
             $prix = $produit->prix; 
             $nomProduit = $produit->nom;
             $message = "Produit ajouté au panier";
@@ -29,11 +74,19 @@ class PanierController extends Controller
             if ($idVariante) {
                 $variante = Variante::find($idVariante);
                 if ($variante && $variante->produit_id == $idProduit) { 
+                    if ($variante->statut != 'Disponible') {
+                        return response(["message"=>"La variante n'est pas disponible pour l'achat"], 400);
+                    }
                     $prix = $variante->prix;
                     $nomProduit = $variante->produit->nom;
                     $message = "Variante ajoutée au panier";
                 }
             }
+    
+            $panier = Panier::where('token', $token)
+                            ->where('idProduit', $idProduit)
+                            ->where('idVariante', $idVariante)
+                            ->first();
     
             if ($panier) {
                 $panier->qty += 1;
@@ -57,6 +110,7 @@ class PanierController extends Controller
             return response(["message"=>"Produit non trouvé"], 404);
         }
     }
+    
 
     public function recupererContenuPanier(Request $request)
     {   
@@ -114,7 +168,7 @@ class PanierController extends Controller
         // return redirect()->route('panier.index')->with('success', 'Quantité mise à jour avec succès');
     }
     
-    // public function addcart(Request $request, $id) {
+    // public function addcarte(Request $request, $id) {
     //     $token = $request->header('Authorization');
     //     $paniers = Panier::where('token', $token)->get(); 
     //     $ids = Panier::where('token', $token)->pluck('idProduit')->toArray();

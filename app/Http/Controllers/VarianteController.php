@@ -24,6 +24,15 @@ class VarianteController extends Controller
         return response()->json(['variantes' => $variantes], 200);
     }
 
+    public function show(Variante $variante)
+    {
+        // Chargez les images associées à la variante
+        $variante->load('images');
+
+        return response()->json(['variante' => $variante], 200);
+    }
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -31,30 +40,36 @@ class VarianteController extends Controller
             'type' => 'required|string|in:couleur,capacite',
             'valeur' => 'required|string',
             'unite' => [
-                'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
-                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+                'required_if:type,capacite',
+                'nullable',
             ],
-            'prix' => 'required|numeric',
-            'images' => 'nullable|array|min:1',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'prix' => 'required|integer',
+            'statut' => 'required|in:Disponible,Indisponible',
+            'images' => [
+                $request->type == 'couleur' ? 'required' : 'nullable',
+                'array',
+                'min:1',
+            ],
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $variante = Variante::create([
             'produit_id' => $request->produit_id,
             'type' => $request->type,
             'valeur' => $request->valeur,
-            'unite' => $request->unite ?? null, // Assurez-vous que l'unité est correctement définie ou null si non applicable
+            'unite' => $request->unite ?? null,
             'prix' => $request->prix,
+            'statut' => $request->statut,
+
         ]);
 
-        // Ajout des images à la variante actuelle
-        if ($request->hasFile('images')) {
+        // Ajout des images à la variante actuelle si le type est "couleur"
+        if ($request->type == 'couleur' && $request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
                 $path = $image->storeAs('public/fichiers_variante/', $filename);
                 $imageName = 'public/fichiers_variante/' . $filename;
 
-                // Enregistrement du chemin de l'image dans la table variante_images
                 VarianteImage::create([
                     'variante_id' => $variante->id,
                     'chemin_image' => $imageName,
@@ -75,6 +90,14 @@ class VarianteController extends Controller
     //         'produit_id' => 'required|exists:produits,id',
     //         'type' => 'required|string|in:couleur,capacite',
     //         'valeur' => 'required|string',
+    //         // 'unite' => [
+    //         //     'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
+    //         //     Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+    //         // ],
+    //         'unite' => [
+    //             'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
+    //             'nullable', // L'unité peut être null si le type est 'couleur'
+    //         ],
     //         'prix' => 'required|numeric',
     //         'images' => 'nullable|array|min:1',
     //         'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -84,6 +107,7 @@ class VarianteController extends Controller
     //         'produit_id' => $request->produit_id,
     //         'type' => $request->type,
     //         'valeur' => $request->valeur,
+    //         'unite' => $request->unite ?? null, // Assurez-vous que l'unité est correctement définie ou null si non applicable
     //         'prix' => $request->prix,
     //     ]);
 
@@ -160,9 +184,10 @@ class VarianteController extends Controller
             'type' => 'required|string|in:couleur,capacite',
             'valeur' => 'required|string',
             'prix' => 'required|numeric',
+            'statut' => 'required|in:Disponible,Indisponible',
             'unite' => [
-                'required_if:type,capacite', // L'unité est requise si le type est 'capacite'
-                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+                'required_if:type,capacite',
+                'nullable',
             ],
             'images' => 'nullable|array|min:1', 
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -173,6 +198,7 @@ class VarianteController extends Controller
             'type' => $request->type,
             'valeur' => $request->valeur,
             'prix' => $request->prix,
+            'statut' => $request->statut,
             'unite' => $request->unite ?? null, // Assurez-vous que l'unité est correctement définie ou null si non applicable
         ]);
 

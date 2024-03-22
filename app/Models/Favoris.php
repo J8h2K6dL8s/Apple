@@ -26,4 +26,9 @@ class Favoris extends Model
 
         return $this->belongsTo(Produit::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -286,10 +286,10 @@ class CommandeController extends Controller
                 $paniers = Panier::where('token', $token)->delete();
     
                 // Envoi du mail à l'adresse de contact
-                Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail($user,$vente, $listeProduit));
+                // Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail($user,$vente, $listeProduit));
                 
                 // Envoi du mail à l'utilisateur
-                if(Mail::to($user->email)->send(new OrderAchatMail($vente,$user, $listeProduit))){
+                if(Mail::to($user->email)->send(new OrderAchatMail($vente,$user))){
                     return response(['success' => 'Achat effectué avec succès. Un e-mail a été envoyé à '.$user->email, 'id'=>$vente->id ], 200);
                 } else {
                     // Gestion d'une éventuelle erreur lors de l'envoi du mail

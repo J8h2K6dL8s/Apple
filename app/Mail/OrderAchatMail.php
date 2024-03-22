@@ -22,11 +22,11 @@ class OrderAchatMail extends Mailable
      * Create a new message instance.
      */
 
-     public function __construct($user,$commande,$listeProduit)
+     public function __construct($user,$commande)
      {
         $this->user = $user;
         $this->commande = $commande ; 
-        $this->listeProduit = $listeProduit;
+        // $this->listeProduit = $listeProduit;
      }
 
     /**
@@ -48,7 +48,8 @@ class OrderAchatMail extends Mailable
         $user = auth('sanctum')->user();
     
         return (new Content)
-        ->view('emails/orderAchatMail',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
+        ->view('emails/orderAchatMail',['user' =>$this->user, 'commande' =>$this->commande]);
+        // ->view('emails/orderAchatMail',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
      
     }
 

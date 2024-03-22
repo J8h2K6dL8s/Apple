@@ -53,6 +53,7 @@ class ProduitController extends Controller
             'couleur' => 'nullable|string', 
             'prix' => 'required|integer',
             'categorie_id' => 'required|exists:categories,id',
+            'statut' => 'required|in:Disponible,Indisponible',
             'images' => 'required|array|min:1',
             'images.*' => 'image|file|mimes:jpeg,png,jpg,|max:2048',
         ]);
@@ -66,6 +67,8 @@ class ProduitController extends Controller
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
+            'statut' => $request->input('statut'),
+
         ]);
 
         // Ajout des images au produit
@@ -98,6 +101,7 @@ class ProduitController extends Controller
             'couleur' => 'nullable|string', 
             'prix' => 'required|integer',
             'categorie_id' => 'required|exists:categories,id',
+            'statut' => 'required|in:Disponible,Indisponible',
             'images' => 'nullable|array|min:1',
             'images.*' => 'nullable|image|file|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -111,6 +115,8 @@ class ProduitController extends Controller
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
+            'statut' => $request->input('statut'),
+
         ]);
 
         // Ajout des nouvelles images seulement si elles sont fournies

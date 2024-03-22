@@ -16,7 +16,8 @@ class Variante extends Model
     
     protected $table = 'variantes'; 
 
-    protected $fillable = ['produit_id', 'type', 'valeur', 'prix'];
+        
+    protected $fillable = ['produit_id', 'type', 'valeur', 'prix','unite','statut'];
 
     protected static function boot()
     {
@@ -26,9 +27,9 @@ class Variante extends Model
             // Supprimer les images associées à cette variante
             $variante->images()->delete();
             // Supprimer le produit associé à cette variante
-            if ($variante->produit) {
-                $variante->produit->delete();
-            }
+            // if ($variante->produit) {
+            //     $variante->produit->delete();
+            // }
         });
     }
 

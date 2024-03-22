@@ -123,6 +123,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/liste-variante', [VarianteController::class, 'index']);
 
+    Route::get('/voir-variantes/{variante}', [VarianteController::class, 'show']);
+
+
     
                                         //FAVORIS
 

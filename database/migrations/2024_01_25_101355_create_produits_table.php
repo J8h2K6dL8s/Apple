@@ -20,6 +20,7 @@ return new class extends Migration
         $table->integer('capacite'); // Changer le type de 'capacite' en integer
         $table->string('unite')->nullable(); // Ajouter le champ 'unite'
         $table->string('couleur')->nullable();
+        $table->string('statut');
         $table->timestamps();
         $table->foreign('categorie_id')->references('id')->on('categories')->onDelete('cascade');
         $table->softDeletes();

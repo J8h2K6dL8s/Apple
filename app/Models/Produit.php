@@ -22,7 +22,7 @@ class Produit extends Model
         'categorie_id',
         'capacite',
         'couleur',
-        // 'traitement'
+        'statut',
        
     ]; 
 
@@ -35,6 +35,10 @@ class Produit extends Model
             $produit->images()->delete();
             // Supprimer les variantes associées à ce produit
             $produit->variantes()->delete();
+            // Supprimer les entrées dans la table 'favoris' associées à ce produit
+            $produit->favoris()->delete();
+            // Supprimer les entrées dans la table 'panier' associées à ce produit
+             Panier::where('idProduit', $produit->id)->delete();
         });
     }
 
@@ -56,6 +60,11 @@ class Produit extends Model
     public function varianteImages()
     {
         return $this->hasMany(VarianteImage::class);
+    }
+
+    public function favoris()
+    {
+        return $this->hasMany(Favoris::class);
     }
 
 }
