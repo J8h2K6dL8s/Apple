@@ -11,6 +11,7 @@ use App\Models\VarianteImage;
 use App\Jobs\VarianteImageJob;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ProduitController extends Controller
 {
@@ -47,8 +48,8 @@ class ProduitController extends Controller
             'description' => 'required|string',
             'capacite' => 'nullable|integer',
             'unite' => [
-                'required_with:capacite', 
-                Rule::in(['Go', 'To']), 
+                'required_with:capacite',  // L'unité est requise si la capacité est fournie
+                'nullable',
             ], 
             'couleur' => 'nullable|string', 
             'prix' => 'required|integer',
@@ -63,7 +64,8 @@ class ProduitController extends Controller
             'nom' => $request->input('nom'),
             'description' => $request->input('description'),
             'capacite' => $request->input('capacite'),
-            'unite' => $request->input('unite'),
+            'unite' => $request->unite ?? null,
+            // 'unite' => $request->input('unite'),
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
@@ -95,8 +97,10 @@ class ProduitController extends Controller
             'description' => 'required|string',
             'capacite' => 'nullable|integer',
             'unite' => [
-                'required_with:capacite', // L'unité est requise si la capacité est fournie
-                Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
+                'required_with:capacite',
+                'nullable',
+                // L'unité est requise si la capacité est fournie
+                // Rule::in(['Go', 'To']), // L'unité doit être 'Go' ou 'To'
             ], 
             'couleur' => 'nullable|string', 
             'prix' => 'required|integer',
@@ -111,7 +115,8 @@ class ProduitController extends Controller
             'nom' => $request->input('nom'),
             'description' => $request->input('description'),
             'capacite' => $request->input('capacite'),
-            'unite' => $request->input('unite'),
+            'unite' => $request->unite ?? null,
+            // 'unite' => $request->input('unite'),
             'couleur' => $request->input('couleur'),
             'prix' => $request->input('prix'),
             'categorie_id' => $request->input('categorie_id'),
@@ -122,7 +127,7 @@ class ProduitController extends Controller
         // Ajout des nouvelles images seulement si elles sont fournies
         if ($request->hasFile('images')) {
             // Supprimer les anciennes images
-            $produit->images()->delete();
+            // $produit->images()->delete();
             
             // Ajouter les nouvelles images
             foreach ($request->file('images') as $image) {
@@ -131,10 +136,9 @@ class ProduitController extends Controller
                 $imageName = 'public/fichiers_produit/' . $filename;
 
                 // Enregistrement du chemin de l'image dans la table produit_images
-                Image::create([
-                    'produit_id' => $produit->id,
-                    'chemin_image' => $imageName,
-                ]);
+                dispatch(new ImageJob($produit->id, $imageName));
+
+             
             }
         }
 

@@ -70,6 +70,9 @@ class VarianteController extends Controller
                 $path = $image->storeAs('public/fichiers_variante/', $filename);
                 $imageName = 'public/fichiers_variante/' . $filename;
 
+                // dispatch(new VarianteImageJob($varianteId->id, $imageName));
+
+
                 VarianteImage::create([
                     'variante_id' => $variante->id,
                     'chemin_image' => $imageName,
@@ -205,7 +208,7 @@ class VarianteController extends Controller
         // Ajout des nouvelles images seulement si elles sont fournies
         if ($request->hasFile('images')) {
             // Supprimer les anciennes images
-            $variante->images()->delete();
+            // $variante->images()->delete();
             
             // Ajouter les nouvelles images
             foreach ($request->file('images') as $image) {

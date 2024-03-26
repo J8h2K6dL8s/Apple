@@ -23,6 +23,7 @@ class Produit extends Model
         'capacite',
         'couleur',
         'statut',
+        'unite',
        
     ]; 
 
