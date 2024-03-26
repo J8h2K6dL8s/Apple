@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 class OrderDetailsMail extends Mailable
 {
     public $user;
+    public $nom;
     public $commande;
     public $produits;
 
@@ -22,10 +23,12 @@ class OrderDetailsMail extends Mailable
      */
 
     // public function __construct($user, $commande, $produits)
-    public function __construct($user, $commande)
+    public function __construct($nom,$commande,$user)
     {
+        $this->nom=$nom;
+        $this->commande = $commande ;
         $this->user = $user;
-        $this->commande = $commande ; 
+         
         // $this->produits = $produits;
     }
 
@@ -36,7 +39,7 @@ class OrderDetailsMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Details de votre commande | Mr Apple' ,
+            subject: 'Details de votre commande | Mr Apple Store' ,
         );
     }
 
@@ -46,8 +49,10 @@ class OrderDetailsMail extends Mailable
     
     public function content(): Content
     {
+        $user = auth('sanctum')->user();
+
         return (new Content)
-        ->view('emails/orderDetailsCommande',['user' =>$this->user, 'commande' =>$this->commande]);
+        ->view('emails/orderDetailsCommande',['nom'=>$this->nom, 'commande' =>$this->commande,'user' =>$this->user]);
         // ->view('emails/orderDetailsCommande',['user' =>$this->user, 'commande' =>$this->commande, 'produits' => $this->produits]);
      
     }

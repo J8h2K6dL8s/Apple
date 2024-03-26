@@ -198,8 +198,8 @@
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>N°: </strong>{{$commande->order_id}}</p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>Date d'achat: </strong>{{now()->format('d-m-Y')}}</p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; Produit(s) commandé(s):</strong></p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</strong>produit 1, produit 2, produit 3,&nbsp;&nbsp;</p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,</p>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; {{$nom}}</p>
+																	{{-- <p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,</p> --}}
 																	<p style="margin: 0;"><strong>&nbsp; &nbsp; Montant total: </strong>{{ $commande->prix_total }} FCFA</p>
 																</div>
 															</td>

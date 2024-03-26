@@ -14,6 +14,7 @@ class OrderAchatMail extends Mailable
     
     public $user;
     public $commande;
+    public $nom;
     public $listeProduit;
 
     use Queueable, SerializesModels;
@@ -22,8 +23,9 @@ class OrderAchatMail extends Mailable
      * Create a new message instance.
      */
 
-     public function __construct($user,$commande)
+     public function __construct($nom,$commande,$user)
      {
+        $this->nom=$nom;
         $this->user = $user;
         $this->commande = $commande ; 
         // $this->listeProduit = $listeProduit;
@@ -35,7 +37,7 @@ class OrderAchatMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre achat | Mr Apple',
+            subject: 'Votre achat | Mr Apple Store',
         );
     }
 
@@ -46,9 +48,9 @@ class OrderAchatMail extends Mailable
     {
         // $this->user =app('currentUser');
         $user = auth('sanctum')->user();
-    
+        
         return (new Content)
-        ->view('emails/orderAchatMail',['user' =>$this->user, 'commande' =>$this->commande]);
+        ->view('emails/orderAchatMail',['nom'=>$this->nom,'user' =>$this->user, 'commande' =>$this->commande]);
         // ->view('emails/orderAchatMail',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
      
     }

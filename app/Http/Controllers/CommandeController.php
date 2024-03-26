@@ -100,9 +100,17 @@ class CommandeController extends Controller
                     $commande->status = $request->status;
                     $commande->save();
 
+                    $nom="";
+                    $tab=json_decode($commande->produit_id);
+                    foreach( $tab as $id){
+                        $produit = Produit::find($id->id);
+                        $nom .=$produit->nom.' - ';
+                    
+                    }
+
                     // Envoyer un e-mail à l'utilisateur
                     $user = User::find($commande->user_id);
-                    Mail::to($user->email)->send(new AnnulerCommandeMail($user, $commande));
+                    Mail::to($user->email)->send(new AnnulerCommandeMail($nom,$commande, $user));
 
                     return response(['message' => "Commande annulée. Un e-mail a été envoyé à ".$user->email], 200);
                 } elseif ($request->status == "Livree") {
@@ -115,8 +123,16 @@ class CommandeController extends Controller
                     // Récupérer les produits associés à la commande
                     // $produits = $commande->produits;
 
+                    $nom="";
+                    $tab=json_decode($commande->produit_id);
+                    foreach( $tab as $id){
+                        $produit = Produit::find($id->id);
+                        $nom .=$produit->nom.' - ';
+                    
+                    }
+
                     // Envoyer un e-mail à l'utilisateur
-                    Mail::to($user->email)->send(new OrderDetailsMail($user, $commande));
+                    Mail::to($user->email)->send(new OrderDetailsMail($nom,$commande, $user));
 
                     return response(['message' => "Commande marquée comme Livrée. Un e-mail a été envoyé à ".$user->email], 200);
                 }
@@ -247,16 +263,17 @@ class CommandeController extends Controller
             
             $transaction = \FedaPay\Transaction::retrieve($request->idTransaction);
  
-            if ($transaction->status == "approved") {
-                return response(['error' =>$transaction], 404);
+            if ($transaction->status !== "approved") {
+                return response(['error' =>"Achat echoué, veuillez ressayer!"], 404);
             } 
     
             $user = auth('sanctum')->user(); // Utilisateur actuellement authentifié
-    
+            $token = $request->header('Authorization');
+              
             if(empty($request->produit_id)){
-                $token = $request->header('Authorization');
+              
                 $paniers = Panier::where('token', $token)->get();
-            
+          
                 if(!$paniers){
                     return response(['message' => 'Panier vide'], 404);
                 }
@@ -281,7 +298,14 @@ class CommandeController extends Controller
                 // Mise à jour du statut de la commande en "en attente"
                 $vente->status = 'En attente';
                 $vente->save();
+            //  dd($vente);
+                $nom="";
+                $tab=json_decode($vente->produit_id);
+                foreach( $tab as $id){
+                    $produit = Produit::find($id->id);
+                    $nom .=$produit->nom.' - ';
                 
+                }
                 // Suppression des paniers
                 $paniers = Panier::where('token', $token)->delete();
     
@@ -289,7 +313,7 @@ class CommandeController extends Controller
                 // Mail::to("contact@mrapple-store.com")->send(new OrderAchatMail($user,$vente, $listeProduit));
                 
                 // Envoi du mail à l'utilisateur
-                if(Mail::to($user->email)->send(new OrderAchatMail($vente,$user))){
+                if(Mail::to($user->email)->send(new OrderAchatMail($nom,$vente,$user))){
                     return response(['success' => 'Achat effectué avec succès. Un e-mail a été envoyé à '.$user->email, 'id'=>$vente->id ], 200);
                 } else {
                     // Gestion d'une éventuelle erreur lors de l'envoi du mail
@@ -373,118 +397,5 @@ class CommandeController extends Controller
 
     }
 
-    public function paymentAnciens(Request $request) {
-  
-        $user = auth('sanctum')->user(); 
-    
-        if($request->codepromo !== "UNDEFINED"){
-           
-            $promo = codePromo::where('intitule', $request->input('codepromo'))->first();
-            
-            if($promo && $promo->nombreUtilisation > 0){
-                $codePromo = $request->codepromo;
-                $promo->nombreUtilisation = $promo->nombreUtilisation - 1;
-                $promo->save();
-             
-                if(!$request->idProduit) {
-                    $url = "https://mrapple-store.com/panier";
-                    $token = $request->header('Authorization');
-                    $paniers = Panier::where('token', $token)->get();
-                    $prix = 0;
-                    $qty = 0;
-                    $idsDansLePanier = [];
-                    
-                    foreach ($paniers as $produit) {
-                        $qty += $produit->qty;
-                        $prix += $produit->prix * $qty;
-                        $idsDansLePanier[] = ["id" => $produit->idProduit, "qty" => $produit->qty];
-                    }
-                    $produits = $idsDansLePanier;
-        
-                    // $prix = $prix - $promo->valeur * $prix /100;
-                    $prix = floor($prix) - $promo->valeur * floor($prix) / 100;
-
-                        
-                } else {
-                    $url = "https://mrapple-store.com/payment";
-                    $produit = Produit::findOrFail($request->idProduit);
-                    $produits[] = ["id" => $produit->id, "qty" => $produit->quantite];
-                    $prix = $produit->prix; 
-                    $qty = 1;
-                        
-                    // $prix = $prix - $promo->valeur * $prix /100;
-                    $prix = floor($prix) - $promo->valeur * floor($prix) / 100;
-                }
-            } else {
-                return response()->json(['erreur' => "Code promo erroné ou code épuisé"]);
-            }
-        } else {
-            $codePromo = null;
-            if(!$request->idProduit) {
-                $url = "https://mrapple-store.com/panier";
-                $token = $request->header('Authorization');
-                $paniers = Panier::where('token', $token)->get();
-                $prix = 0;
-                $qty = 0;
-                $idsDansLePanier = [];
-                foreach ($paniers as $produit) {
-                    $qty += $produit->qty;
-                    $prix += $produit->prix * $produit->qty;
-                    $idsDansLePanier[] = ["id" => $produit->idProduit, "qty" => $produit->qty];
-                }
-                $produits = $idsDansLePanier;
-            }
-        }
-    
-        $prefix = 'MRAPPLE_ORDER-';
-        $randomNumber = mt_rand(1000, 9999); 
-        $orderID = $prefix . $randomNumber;
-        $produits_serialized = json_encode($produits);
-    
-        $vente = Commande::create([
-            'order_id' => $orderID,
-            'codePromo' => $codePromo ? $codePromo : null,
-            'produit_id' => $produits_serialized,
-            'prix_total' => $prix,
-            'status' => "Unpaid",
-            'quantite' => $qty,
-            'user_id' => $user->id,
-            'user_name' => $user->nom . ' ' . $user->prenoms,
-            'date_created' => now()
-        ]);
-    
-        // Remplacez VOTRE_CLE_API par votre véritable clé API
-        \FedaPay\FedaPay::setApiKey("sk_sandbox_fKlwsz7knL1sZiXTjXLhTaOw");
-        // \FedaPay\FedaPay::setApiKey("sk_sandbox_mGVNXupMPNzgS08eH8BGsJlo");
-        // Précisez si vous souhaitez exécuter votre requête en mode test ou live
-        \FedaPay\FedaPay::setEnvironment('sandbox'); //ou setEnvironment('live');
-    
-        // Créer la transaction
-        // $transaction = \FedaPay\Transaction::create([
-          
-            $tab=explode(' ',$user->nom);
-        $transaction = \FedaPay\Transaction::create(array(
-
-            "description" => $user->nom . " " . $prix,
-            "amount" => intval($prix),
-            // "amount" => $prix,
-            "currency" => ["iso" => "XOF"],
-            "callback_url" => $url,
-            "customer" => [
-                "firstname" =>$tab[0],
-                "lastname" =>$tab[1],
-                "email" => $user->email,
-                "phone_number" => [
-                    "number" => $user->telephone,
-                    "country" => "bj"
-                ]
-            ]
-        ));
-
-    
-        $token = $transaction->generateToken(); 
-    
-        return response()->json(['url' => $token->url, 'commande' => $vente], 200);
-    }
 
 }

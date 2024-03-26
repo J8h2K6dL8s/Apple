@@ -12,19 +12,20 @@ use Illuminate\Queue\SerializesModels;
 class AnnulerCommandeMail extends Mailable
 {
     public $user;
+    public $nom;
     public $commande;
-    public $listeProduit;
+
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
 
-    public function __construct($user, $commande)
+    public function __construct($nom,$commande,$user)
     {
+        $this->nom=$nom;
+        $this->commande = $commande ;
         $this->user = $user;
-        $this->commande = $commande ; 
-        // $this->listeProduit = $listeProduit;
     }
 
     /**
@@ -33,7 +34,7 @@ class AnnulerCommandeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Annuler Commande | Mr Apple',
+            subject: 'Annuler Commande | Mr Apple Store',
         );
     }
 
@@ -43,7 +44,7 @@ class AnnulerCommandeMail extends Mailable
     public function content(): Content
     {
         return (new Content)
-        ->view('emails/annulerCommande',['user' =>$this->user, 'commande' =>$this->commande]);
+        ->view('emails/annulerCommande',['nom'=>$this->nom, 'commande' =>$this->commande,'user' =>$this->user]);
         // ->view('emails/orderDetailsCommande',['user' =>$this->user,'produit' => $this->listeProduit, 'commande' =>$this->commande]);
      
     }

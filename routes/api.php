@@ -180,9 +180,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/payer-livraison', [CommandeController::class, 'payer']);
 
-
-
-
                                             //TRADE
 
     Route::get('/liste-trades', [TradeController::class, 'index']);

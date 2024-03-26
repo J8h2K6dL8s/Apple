@@ -247,7 +247,7 @@
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Details de la commande:</strong></p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N°: </strong>{{ $commande->order_id }}</p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Produit(s) commandé(s):</strong></p>
-																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </strong>produit 1, produit 2, produit 3,&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; produit 2,&nbsp; produit 2,&nbsp; produit 2</p>
+																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </strong>{{$nom}}&nbsp; </p>
 																	<p style="margin: 0; margin-bottom: 16px;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date d'achat: </strong>{{now()->format('d-m-Y')}}</p>
 																	<p style="margin: 0;"><strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Montant total: </strong>{{ $commande->prix_total }} FCFA</p>
 																</div>
